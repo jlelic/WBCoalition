@@ -1,0 +1,18 @@
+﻿## Interface: 11304
+## Title: World Boss Coalition
+## Author: jlelic
+## Version: 0.2a
+## Notes: Our technological advantage against Patrix
+## SavedVariables: WBCDB WBCCache
+## SavedVariablesPerCharacter: WBCIcon 
+
+lib/embeds.xml
+WBCoalition.lua
+WBCTracker.lua
+WBCTable.xml
+WBCTable.lua
+WBCLootLog.xml
+WBCScoutScanner.lua
+WBCInviteHelper.lua
+WBCLootDistributor.lua
+WBCSync.lua

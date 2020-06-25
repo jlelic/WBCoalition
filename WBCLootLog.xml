@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    <Frame name="WBCLootLog" movable="true" hidden="true" toplevel="true">
+        <Scripts>
+            <OnLoad>
+                self:SetFrameLevel(WBCTableFrame:GetFrameLevel() + 5)
+            </OnLoad>
+            <OnMouseDown>
+                WBCLootLog:StartMoving()
+            </OnMouseDown>
+            <OnMouseUp>
+                WBCLootLog:StopMovingOrSizing()
+            </OnMouseUp>
+        </Scripts>
+        <Size x="480" y="480" />
+        <Anchors>
+            <Anchor point="CENTER" />
+        </Anchors>
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <EdgeSize>
+                <AbsValue val="32"></AbsValue>
+            </EdgeSize>
+            <TileSize>
+                <AbsValue val="32" />
+            </TileSize>
+            <BackgroundInsets>
+                <AbsInset left="4" right="4" top="4" bottom="4" />
+            </BackgroundInsets>
+        </Backdrop>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture name="$parent_Header" file="Interface\DialogFrame\UI-DialogBox-Header">
+                    <Size>
+                        <AbsDimension x="320" y="64" />
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="14" />
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <FontString name="$parent_Title" font="GameFontNormal" Text="WBC Loot Log">
+                    <Anchors>
+                        <Anchor point="TOP"></Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="0" a="1" />
+                </FontString>
+            </Layer>
+            <!--             <Layer>
+                <FontString name="$parentTipText" font="GameFontNormal" text="Copy and paste data from |cffffff00Base64 CSV Points|r cell in |cffffff00Leaderboard|r sheet">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="14" y="-32" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+            </Layer> -->
+        </Layers>
+        <Frames>
+            <Button name="$parentTopCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset x="-8" y="-6" />
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+                       self:SetFrameLevel(WBCLootLog:GetFrameLevel() + 1) 
+                    </OnLoad>
+                    <OnClick>
+                        WBCLootLog:Hide()
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentTopCloseButton" inherits="OptionsButtonTemplate" text="Clear">
+                <Anchors>
+                    <Anchor point="BOTTOM">
+                        <Offset x="0" y="12" />
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+                       self:SetFrameLevel(WBCLootLog:GetFrameLevel() + 1) 
+                    </OnLoad>
+                    <OnClick>
+                        WBCLootDistributor:ClearLog()
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <Frame name="WBCLoadContentFrame">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="12" y="-30" />
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT">
+                        <Offset x="-12" y="32" />
+                    </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                    <EdgeSize>
+                        <AbsValue val="16"></AbsValue>
+                    </EdgeSize>
+                    <TileSize>
+                        <AbsValue val="32" />
+                    </TileSize>
+                    <BackgroundInsets>
+                        <AbsInset left="4" right="4" top="4" bottom="4" />
+                    </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                    <OnLoad>
+                        self:SetBackdropColor(0,0,0,.65)
+                    </OnLoad>
+                </Scripts>
+                <Frames>
+                    <ScrollFrame name="WBCLootLogScrollFrame" inherits="UIPanelScrollFrameTemplate" toplevel="true">
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM">
+                                <Offset>
+                                    <AbsDimension x="0" y="10" />
+                                </Offset>
+                            </Anchor>
+                            <Anchor point="BOTTOM" relativePoint="TOP">
+                                <Offset>
+                                    <AbsDimension x="0" y="-10" />
+                                </Offset>
+                            </Anchor>
+                            <Anchor point="LEFT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0" />
+                                </Offset>
+                            </Anchor>
+                            <Anchor point="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="-30" y="0" />
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <ScrollChild>
+                            <EditBox name="WBCLootLogEditBox" letters="99999" multiLine="true" autoFocus="true" enableMouse="true">
+                                <Size>
+                                    <AbsDimension x="340" y="320" />
+                                </Size>
+                                <FontString inherits="ChatFontNormal" />
+                                <Scripts>
+                                    <OnLoad>
+                                        self:SetAutoFocus(false)
+                                    </OnLoad>
+                                    <OnShow>
+                                        WBCLootDistributor:SetLootLogText()
+                                    </OnShow>
+                                    <OnTextChanged>
+                                        WBCLootDistributor:SetLootLogText()
+                                    </OnTextChanged>
+                                    <OnEscapePressed>
+                                        self:ClearFocus()
+                                    </OnEscapePressed>
+                                </Scripts>
+                            </EditBox>
+                        </ScrollChild>
+                    </ScrollFrame>
+                </Frames>
+            </Frame>
+
+        </Frames>
+    </Frame>
+</Ui>

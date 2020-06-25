@@ -1,0 +1,901 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    <Frame name="WBCTableDropDownMenu" inherits="UIDropDownMenuTemplate" hidden="true">
+        <Size />
+    </Frame>
+    <FontString name="WBCTableStringTemplate" font="GameFontHighlightSmall" justifyH="LEFT" nonspacewrap="false" virtual="true" />
+    <FontString name="WBCTableNameTemplate" inherits="WBCTableStringTemplate" virtual="true">
+        <Anchors>
+            <Anchor point="TOPLEFT" />
+        </Anchors>
+        <Size x="100" y="15" />
+    </FontString>
+    <FontString name="WBCTablePointsTemplate" inherits="WBCTableStringTemplate" justifyH="CENTER" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+                <Offset x="8" y="0" />
+            </Anchor>
+        </Anchors>
+        <Size x="62" y="15" />
+    </FontString>
+    <FontString name="WBCTableInRaidAsTemplate" inherits="WBCTableStringTemplate" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentPoints" relativePoint="RIGHT">
+                <Offset x="8" y="0" />
+            </Anchor>
+        </Anchors>
+        <Size x="150" y="15" />
+    </FontString>
+    <FontString name="WBCTableAltsTemplate" inherits="WBCTableStringTemplate" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentInRaidAs" relativePoint="RIGHT">
+                <Offset x="8" y="0" />
+            </Anchor>
+        </Anchors>
+        <Size x="620" y="15" />
+    </FontString>
+    <FontString name="WBCTableLastUpdateTemplate" inherits="WBCTableStringTemplate" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentAlts" relativePoint="RIGHT">
+                <Offset x="8" y="0" />
+            </Anchor>
+        </Anchors>
+        <Size x="380" y="15" />
+    </FontString>
+    <Button name="WBCTablePlayerHistoryButtonTemplate" virtual="true">
+        <Size x="0" y="15" />
+        <NormalTexture name="$parentTexture">
+            <Color a="0" />
+        </NormalTexture>
+        <Frames>
+            <Frame setAllPoints="true">
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString name="$parentName" inherits="WBCTableNameTemplate"></FontString>
+                        <FontString name="$parentPoints" inherits="WBCTablePointsTemplate"></FontString>
+                        <FontString name="$parentInRaidAs" inherits="WBCTableInRaidAsTemplate"></FontString>
+                        <FontString name="$parentAlts" inherits="WBCTableAltsTemplate"></FontString>
+                        <FontString name="$parentLastUpdate" inherits="WBCTableLastUpdateTemplate"></FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+        </Frames>
+        <Scripts>
+            <OnEnter>
+				<!-- TODO Spy:ShowTooltip(self, true)	-->
+            </OnEnter>
+            <OnLeave>
+				<!-- TODO Spy:ShowTooltip(self, false)	-->
+            </OnLeave>
+            <OnMouseUp>
+                <!--                Spy:ShowUnitDropDown(self, button)  DO NOT DELETE THIS  -->
+                WBCTable:ShowDropDown(self, button)
+            </OnMouseUp>
+        </Scripts>
+        <HighlightTexture file="Interface\FriendsFrame\UI-FriendsFrame-HighlightBar" />
+    </Button>
+    <Button name="WBCTableSortButtonTemplate" virtual="true">
+        <ButtonText>
+            <Anchors>
+                <Anchor point="LEFT">
+                    <Offset>
+                        <AbsDimension x="0" y="0" />
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </ButtonText>
+        <NormalFont style="GameFontNormal" />
+        <Scripts>
+            <OnClick>
+                WBCTable:SetSortColumn(self:GetName())				
+            </OnClick>
+        </Scripts>
+    </Button>
+    <Button name="WBCTablePlayersNameSortTemplate" inherits="WBCTableSortButtonTemplate" text="Main Name" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" />
+        </Anchors>
+        <Size x="100" y="15"></Size>
+    </Button>
+    <Button name="WBCTablePlayersPointsSortTemplate" inherits="WBCTableSortButtonTemplate" text="Points" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="WBCTablePlayersNameSort" relativePoint="RIGHT">
+                <Offset x="8" y="0" />
+            </Anchor>
+        </Anchors>
+        <Size x="60" y="15"></Size>
+        <ButtonText justifyH="CENTER" />
+    </Button>
+    <Button name="WBCTablePlayersInRaidAsSortTemplate" inherits="WBCTableSortButtonTemplate" text="In Raid As" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="WBCTablePlayersPointsSort" relativePoint="RIGHT">
+                <Offset x="8" y="0" />
+            </Anchor>
+        </Anchors>
+        <Size x="150" y="15"></Size>
+    </Button>
+    <Button name="WBCTablePlayersAltsSortTemplate" inherits="WBCTableSortButtonTemplate" text="Alts" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="WBCTablePlayersInRaidAsSort" relativePoint="RIGHT">
+                <Offset x="8" y="0" />
+            </Anchor>
+        </Anchors>
+        <Size x="380" y="15"></Size>
+    </Button>
+    <Button name="WBCTablePlayersLastUpdateSortTemplate" inherits="WBCTableSortButtonTemplate" text="" virtual="true">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="WBCTablePlayersAltsSort" relativePoint="RIGHT">
+                <Offset x="8" y="0" />
+            </Anchor>
+        </Anchors>
+        <Size x="250" y="15"></Size>
+    </Button>
+    <Frame name="WBCTableFrame" parent="UIParent" frameStrata="MEDIUM" movable="true" toplevel="true" enableMouse="true" hidden="false">
+        <NormalTexture name="$parentTexture">
+            <Color r="0" g="0" b="0" a="1" />
+        </NormalTexture>
+        <Size x="1100" y="610" />
+        <Anchors>
+            <Anchor point="CENTER" />
+        </Anchors>
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <EdgeSize>
+                <AbsValue val="32"></AbsValue>
+            </EdgeSize>
+            <TileSize>
+                <AbsValue val="32" />
+            </TileSize>
+            <BackgroundInsets>
+                <AbsInset left="4" right="4" top="4" bottom="4" />
+            </BackgroundInsets>
+        </Backdrop>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture name="$parent_Header" file="Interface\DialogFrame\UI-DialogBox-Header">
+                    <Size>
+                        <AbsDimension x="320" y="64" />
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="14" />
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <FontString name="$parent_Title" font="GameFontNormal" Text="Coalition Points Sheet">
+                    <Anchors>
+                        <Anchor point="TOP"></Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="0" a="1" />
+                </FontString>
+            </Layer>
+            <Layer>
+                <FontString name="$parentFilterText" font="GameFontNormal" text="Filter">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT">
+                            <Offset x="14" y="16" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+                <FontString name="$parentShowOnlyText" font="GameFontNormal" text="Show only your raid">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT">
+                            <Offset x="160" y="18" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+                <FontString name="$parentShowOnlyNotText" font="GameFontNormal" text="NOT in your raid">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT">
+                            <Offset x="320" y="18" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+                <FontString name="$parentShowInterestedText" font="GameFontNormal" text="+ in chat">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT">
+                            <Offset x="458" y="18" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+                <FontString name="$parentLastUpdateText" font="GameFontNormalSmall" text="">
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT">
+                            <Offset x="-110" y="19" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+                <FontString name="WBCTableHonorKillsText" font="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT">
+                            <Offset x="640" y="16" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+                <FontString name="WBCTablePvPDeathsText" font="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT">
+                            <Offset x="800" y="16" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame name="$parentIcon">
+                <Size x="80" y="80" />
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="-28" y="28" />
+                    </Anchor>
+                </Anchors>
+                <!--               <Layers>
+                    <Layer level="OVERLAY">
+						<Texture file="Interface\Addons\Spy\Textures\IconBorder.tga">
+						</Texture>
+					</Layer>
+                    <Layer level="ARTWORK">
+                       <Texture file="Interface\Icons\Spell_hunter_focusingshot"> 
+                            <Size x="40" y="40" />
+                            <Anchors>
+                                <Anchor point="TOPLEFT">
+                                    <Offset x="20" y="-19" />
+                                </Anchor>
+                            </Anchors>
+                            <TexCoords left=".1" right=".9" top=".1" bottom=".9" />
+                        </Texture>
+                    </Layer>
+                </Layers> -->
+            </Frame>
+            <Button name="$parentTopCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset x="-8" y="-6" />
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+                       self:SetFrameLevel(WBCTableFrame:GetFrameLevel() + 1) 
+                    </OnLoad>
+                    <OnClick>
+                        WBCTableFrame:Hide()
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <Frame name="WBCTableTabFrame">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="12" y="-12" />
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT">
+                        <Offset x="-12" y="34" />
+                    </Anchor>
+                </Anchors>
+                <Frames>
+                    <Button name="$parentTab1" inherits="OptionsFrameTabButtonTemplate" hidden="true" text="TUTORIAL_TITLE19">
+                        <!-- button is hidden until more tabs are added -->
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset x="22" y="2" />
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                PanelTemplates_TabResize(self, 0)
+                            </OnLoad>
+                            <OnClick>
+                                PanelTemplates_SetTab(self:GetParent(), 1)
+								WBCTable:UpdateView()
+                                WBCTable:Recalulate()
+                                <!--                                PlaySound("igCharacterInfoTab") Error in v7.3 -->
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+                    <Button name="WBCTableRefreshButton" inherits="OptionsButtonTemplate" text="Report all +">
+                        <Anchors>
+                            <Anchor point="BOTTOMLEFT">
+                                <Offset x="535" y="-20" />
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.timer = 0
+                            </OnLoad>
+                            <OnUpdate>
+                                <!-- TODO WBCTable:OnRefreshButtonUpdate(self, elapsed) -->
+                            </OnUpdate>
+                            <OnClick>
+                                <!--                                PlaySound("igMainMenuOptionCheckBoxOn") Error in v7.3-->
+                                WBCTable:ReportPluses()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+                    <Button name="WBCTableRefreshButton" inherits="OptionsButtonTemplate" text="Clear +">
+                        <Anchors>
+                            <Anchor point="BOTTOMLEFT">
+                                <Offset x="630" y="-20" />
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.timer = 0
+                            </OnLoad>
+                            <OnUpdate>
+                                <!-- TODO WBCTable:OnRefreshButtonUpdate(self, elapsed) -->
+                            </OnUpdate>
+                            <OnClick>
+                                <!--                                PlaySound("igMainMenuOptionCheckBoxOn") Error in v7.3-->
+                                WBCTable:ClearPluses()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+                    <Button name="WBCTableLoadDataButton" inherits="OptionsButtonTemplate" text="Load Data">
+                        <Anchors>
+                            <Anchor point="BOTTOMRIGHT">
+                                <Offset x="-6" y="-20" />
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnClick>
+                                WBCLoadFrame:Show()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+                    <Frame name="$parentTabContentFrame">
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset x="0" y="-22" />
+                            </Anchor>
+                            <Anchor point="BOTTOMRIGHT"></Anchor>
+                        </Anchors>
+                        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                            <EdgeSize>
+                                <AbsValue val="16"></AbsValue>
+                            </EdgeSize>
+                            <TileSize>
+                                <AbsValue val="32" />
+                            </TileSize>
+                            <BackgroundInsets>
+                                <AbsInset left="4" right="4" top="4" bottom="4" />
+                            </BackgroundInsets>
+                        </Backdrop>
+                        <Scripts>
+                            <OnLoad>
+                                self:SetBackdropColor(0,0,0,.65)
+                            </OnLoad>
+                        </Scripts>
+                        <Frames>
+                            <ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT">
+                                        <Offset x="0" y="-24" />
+                                    </Anchor>
+                                    <Anchor point="BOTTOMRIGHT">
+                                        <Offset x="-30" y="10" />
+                                    </Anchor>
+                                </Anchors>
+                                <Scripts>
+                                    <OnVerticalScroll>
+                                        FauxScrollFrame_OnVerticalScroll(self, offset, 15, WBCTable.Refresh)
+                                    </OnVerticalScroll>
+                                </Scripts>
+                            </ScrollFrame>
+                            <Frame name="WBCTablePlayerHistoryFrame" setAllPoints="true">
+                                <Frames>
+                                    <Frame name="$parentHeaderFrame">
+                                        <Size x="0" y="18" />
+                                        <Anchors>
+                                            <Anchor point="TOPLEFT">
+                                                <Offset x="8" y="-8" />
+                                            </Anchor>
+                                            <Anchor point="TOPRIGHT">
+                                                <Offset x="-38" y="-8" />
+                                            </Anchor>
+                                        </Anchors>
+                                        <Frames>
+                                            <Button name="WBCTablePlayersNameSort" inherits="WBCTablePlayersNameSortTemplate" />
+                                            <Button name="WBCTablePlayersPointsSort" inherits="WBCTablePlayersPointsSortTemplate" />
+                                            <Button name="WBCTablePlayersInRaidAsSort" inherits="WBCTablePlayersInRaidAsSortTemplate" />
+                                            <Button name="WBCTablePlayersAltsSort" inherits="WBCTablePlayersAltsSortTemplate" />
+                                            <Button name="WBCTablePlayersLastUpdateSort" inherits="WBCTablePlayersLastUpdateSortTemplate" />
+                                        </Frames>
+                                    </Frame>
+                                    <Frame name="$parentListFrame">
+                                        <Anchors>
+                                            <Anchor point="TOPLEFT">
+                                                <Offset x="0" y="-24" />
+                                            </Anchor>
+                                            <Anchor point="BOTTOMRIGHT">
+                                                <Offset x="-30" y="10" />
+                                            </Anchor>
+                                        </Anchors>
+                                        <Frames>
+                                            <Button name="$parentLine1" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT">
+                                                        <Offset x="8" y="0" />
+                                                    </Anchor>
+                                                    <Anchor point="TOPRIGHT">
+                                                        <Offset x="-8" y="0" />
+                                                    </Anchor>
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine2" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine1" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine3" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine2" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine4" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine3" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine5" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine4" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine6" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine5" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine7" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine6" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine8" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine7" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine9" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine8" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine10" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine9" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine11" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine10" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine12" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine11" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine13" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine12" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine14" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine13" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine15" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine14" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine16" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine15" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine17" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine16" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine18" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine17" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine19" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine18" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine20" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine19" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine21" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine20" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine22" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine21" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine23" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine22" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine24" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine23" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine25" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine24" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine26" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine25" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine27" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine26" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine28" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine27" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine29" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine28" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine30" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine29" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine31" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine30" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine32" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine31" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine33" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine32" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                            <Button name="$parentLine34" inherits="WBCTablePlayerHistoryButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" relativeTo="$parentLine33" relativePoint="BOTTOMLEFT" />
+                                                    <Anchor point="RIGHT" relativeTo="$parentLine1" />
+                                                </Anchors>
+                                            </Button>
+                                        </Frames>
+                                    </Frame>
+                                </Frames>
+                            </Frame>
+                        </Frames>
+                        <Scripts>
+                            <OnLoad>
+                                self:SetBackdropColor(0,0,0,.5)
+                                self:SetFrameLevel(self:GetParent():GetFrameLevel() - 1)
+                            </OnLoad>
+                        </Scripts>
+                    </Frame>
+                </Frames>
+                <Scripts>
+                    <OnLoad>
+                        PanelTemplates_SetNumTabs(self, 1) 
+                        PanelTemplates_SetTab(self, 1)
+                    </OnLoad>
+                </Scripts>
+            </Frame>
+            <EditBox name="WBCTableFilterBox" autoFocus="false" multiLine="false">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentFilterText" relativePoint="RIGHT" />
+                </Anchors>
+                <Size>
+                    <AbsDimension x="100" y="26" />
+                </Size>
+                <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                    <EdgeSize>
+                        <AbsValue val="16"></AbsValue>
+                    </EdgeSize>
+                    <TileSize>
+                        <AbsValue val="32" />
+                    </TileSize>
+                    <BackgroundInsets>
+                        <AbsInset left="4" right="4" top="4" bottom="4" />
+                    </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                    <OnLoad>
+                        self:SetBackdropColor(0,0,0,.65)
+                    </OnLoad>
+                    <OnEnterPressed>
+                        self:ClearFocus()
+                    </OnEnterPressed>
+                    <OnEscapePressed>
+                        self:ClearFocus()
+                    </OnEscapePressed>
+                    <OnTextChanged>
+                        WBCTable:Filter()
+                    </OnTextChanged>
+                </Scripts>
+                <FontString inherits="GameFontHighlight">
+                    <Size />
+                </FontString>
+                <TextInsets left="6" right="6" top="6" bottom="6" />
+            </EditBox>
+            <CheckButton name="WBCTableInRaidCheckbox" inherits="OptionsCheckButtonTemplate">
+                <Size>
+                    <AbsDimension x="24" y="24" />
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentShowOnlyText" relativePoint="RIGHT">
+                        <Offset x="4" y="-2" />
+                    </Anchor>
+                </Anchors>
+                <HitRectInsets>
+                    <AbsInset left="0" right="0" top="0" bottom="0" />
+                </HitRectInsets>
+                <Scripts>
+                    <OnClick>
+                        WBCTable:RaidOnlyToggled()
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="WBCTableNotInRaidCheckbox" inherits="OptionsCheckButtonTemplate">
+                <Size>
+                    <AbsDimension x="24" y="24" />
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentShowOnlyNotText" relativePoint="RIGHT">
+                        <Offset x="4" y="-2" />
+                    </Anchor>
+                </Anchors>
+                <HitRectInsets>
+                    <AbsInset left="0" right="0" top="0" bottom="0" />
+                </HitRectInsets>
+                <Scripts>
+                    <OnClick>
+                        WBCTable:RaidOnlyNotToggled()
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="WBCTableShowInterestedCheckbox" inherits="OptionsCheckButtonTemplate">
+                <Size>
+                    <AbsDimension x="24" y="24" />
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentShowInterestedText" relativePoint="RIGHT">
+                        <Offset x="4" y="-2" />
+                    </Anchor>
+                </Anchors>
+                <HitRectInsets>
+                    <AbsInset left="0" right="0" top="0" bottom="0" />
+                </HitRectInsets>
+                <Scripts>
+                    <OnClick>
+                        WBCTable:ShowInterestedToggled()
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+        </Frames>
+        <Scripts>
+            <OnShow>
+                <!--                PlaySound("igCharacterInfoTab") Error in v7.3 -->
+            </OnShow>
+            <OnHide>
+                <!--                PlaySound("igMainMenuClose") Error in v7.3-->
+            </OnHide>
+            <OnMouseDown>
+                WBCTableFrame:StartMoving()
+            </OnMouseDown>
+            <OnMouseUp>
+                WBCTableFrame:StopMovingOrSizing()
+            </OnMouseUp>
+        </Scripts>
+    </Frame>
+
+
+    <Frame name="WBCLoadFrame" movable="true" hidden="true" toplevel="true">
+        <Scripts>
+            <OnLoad>
+                self:SetFrameLevel(WBCTableFrame:GetFrameLevel() + 5) 
+            </OnLoad>
+            <OnMouseDown>
+                WBCLoadFrame:StartMoving()
+            </OnMouseDown>
+            <OnMouseUp>
+                WBCLoadFrame:StopMovingOrSizing()
+            </OnMouseUp>
+        </Scripts>
+        <Size x="480" y="480" />
+        <Anchors>
+            <Anchor point="CENTER" />
+        </Anchors>
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <EdgeSize>
+                <AbsValue val="32"></AbsValue>
+            </EdgeSize>
+            <TileSize>
+                <AbsValue val="32" />
+            </TileSize>
+            <BackgroundInsets>
+                <AbsInset left="4" right="4" top="4" bottom="4" />
+            </BackgroundInsets>
+        </Backdrop>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture name="$parent_Header" file="Interface\DialogFrame\UI-DialogBox-Header">
+                    <Size>
+                        <AbsDimension x="320" y="64" />
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="14" />
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <FontString name="$parent_Title" font="GameFontNormal" Text="Load Sheet Data">
+                    <Anchors>
+                        <Anchor point="TOP"></Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="0" a="1" />
+                </FontString>
+            </Layer>
+            <Layer>
+                <FontString name="$parentTipText" font="GameFontNormal" text="Copy and paste data from |cffffff00Base64 CSV Points|r cell in |cffffff00Leaderboard|r sheet">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="14" y="-32" />
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1" />
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button name="$parentTopCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset x="-8" y="-6" />
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+                       self:SetFrameLevel(WBCLoadFrame:GetFrameLevel() + 1) 
+                    </OnLoad>
+                    <OnClick>
+                        WBCLoadFrame:Hide()
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <Frame name="WBCLoadContentFrame">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="12" y="-48" />
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT">
+                        <Offset x="-12" y="32" />
+                    </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                    <EdgeSize>
+                        <AbsValue val="16"></AbsValue>
+                    </EdgeSize>
+                    <TileSize>
+                        <AbsValue val="32" />
+                    </TileSize>
+                    <BackgroundInsets>
+                        <AbsInset left="4" right="4" top="4" bottom="4" />
+                    </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                    <OnLoad>
+                        self:SetBackdropColor(0,0,0,.65)
+                    </OnLoad>
+                </Scripts>
+                <Frames>
+                    <ScrollFrame name="WBCLoadScrollFrame" inherits="UIPanelScrollFrameTemplate" toplevel="true">
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM">
+                                <Offset>
+                                    <AbsDimension x="0" y="10" />
+                                </Offset>
+                            </Anchor>
+                            <Anchor point="BOTTOM" relativePoint="TOP">
+                                <Offset>
+                                    <AbsDimension x="0" y="-10" />
+                                </Offset>
+                            </Anchor>
+                            <Anchor point="LEFT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0" />
+                                </Offset>
+                            </Anchor>
+                            <Anchor point="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="-30" y="0" />
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <ScrollChild>
+                            <EditBox name="WBCLoadEditBox" letters="99999" multiLine="true" autoFocus="true" enableMouse="true">
+                                <Size>
+                                    <AbsDimension x="340" y="280" />
+                                </Size>
+                                <FontString inherits="ChatFontNormal" />
+                                <Scripts>
+                                    <OnTextChanged>
+                                        WBCTable:ParseInput()
+                                    </OnTextChanged>
+                                </Scripts>
+                            </EditBox>
+                        </ScrollChild>
+                    </ScrollFrame>
+                </Frames>
+            </Frame>
+
+        </Frames>
+    </Frame>
+</Ui>
