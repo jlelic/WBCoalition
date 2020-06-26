@@ -1,5 +1,4 @@
 WBCoalition.Sync = {}
-
 local Sync = WBCoalition.Sync
 
 local WBC_PREFIX = 'WBCoa'

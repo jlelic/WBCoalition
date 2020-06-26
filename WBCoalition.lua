@@ -1,3 +1,5 @@
+WBCoalition = {}
+
 SLASH_WBC1 = "/wbc"
 
 WBCIcon = {}
@@ -5,11 +7,11 @@ WBCDB = {players = {}, altMap = {}, lastUpdate = {}}
 WBCCache = {classes = {}, tracks = {}, loogLot = {}}
 WBCTemp = {normalizedStrings = {}}
 
-WBC_CLASS_COLOR_NONE = '|cffc2b5b5'
+WBCoalition.CLASS_COLOR_NONE = '|cffc2b5b5'
 
 local greenDragonColor = '|cff99ff99'
 
-WBC_BOSS_DATA = {
+WBCoalition.BOSS_DATA = {
     ['Lord Kazzak'] = {
         loot = {18546, 17111, 18204, 19135, 18544, 19134, 19133, 18543, 17112, 17113, 18665},
         color = '|cffaa99ff'
@@ -27,12 +29,10 @@ WBC_BOSS_DATA = {
     }
 }
 
-WBC_BOSS_NAMES = {}
-for bossName,_ in pairs(WBC_BOSS_DATA) do
-    table.insert(WBC_BOSS_NAMES, bossName)
+WBCoalition.BOSS_NAMES = {}
+for bossName,_ in pairs(WBCoalition.BOSS_DATA) do
+    table.insert(WBCoalition.BOSS_NAMES, bossName)
 end
-
-WBCoalition = {}
 
 local tableAccents = {}
 tableAccents["å"] = "a"
@@ -143,7 +143,7 @@ function WBCoalition:Initialize()
     icon:Register("WBCIcon", iconLDB, self.db.profile.minimap)
 
     -- cache loot item info
-    for boss,data in pairs(WBC_BOSS_DATA) do
+    for boss,data in pairs(WBCoalition.BOSS_DATA) do
         for _,itemId in pairs(data.loot) do
             GetItemInfo(itemId)
         end
@@ -173,10 +173,10 @@ function WBCoalition:GetClassColoredName(name)
     if name == nil then return nil end
 
     local playerClass = WBCCache.classes[name]
-    local classColor = WBC_CLASS_COLOR_NONE
+    local classColor = WBCoalition.CLASS_COLOR_NONE
     if playerClass == nil then
         _, playerClass = UnitClass(name)
-        if playerClass == nil then return WBC_CLASS_COLOR_NONE .. name end
+        if playerClass == nil then return WBCoalition.CLASS_COLOR_NONE .. name end
         _, _, _, classColor = GetClassColor(playerClass)
         WBCCache.classes[name] = playerClass
     else

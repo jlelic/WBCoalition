@@ -1,5 +1,5 @@
 WBCoalition.Table = {}
-Table = WBCoalition.Table
+local Table = WBCoalition.Table
 
 local players = {}
 local altMap = {}
@@ -86,7 +86,7 @@ local function createDropdown(node)
             info = UIDropDownMenu_CreateInfo()
             info.notCheckable = true
             info.disabled = true
-            info.text = WBC_CLASS_COLOR_NONE .. "You can't kick people"
+            info.text = WBCoalition.CLASS_COLOR_NONE .. "You can't kick people"
             UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL)
         end
     else
@@ -100,7 +100,7 @@ local function createDropdown(node)
             info = UIDropDownMenu_CreateInfo()
             info.notCheckable = true
             info.disabled = true
-            info.text = WBC_CLASS_COLOR_NONE .. "You can't invite"
+            info.text = WBCoalition.CLASS_COLOR_NONE .. "You can't invite"
             UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL)
         end
     end
@@ -198,7 +198,7 @@ function WBC_InitBossDropDown()
     UIDropDownMenu_AddButton(info)
    
 
-    for bossName, data in pairs(WBC_BOSS_DATA) do
+    for bossName, data in pairs(WBCoalition.BOSS_DATA) do
         info.text = '    '  .. data.color .. bossName .. '    '
  --       info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
         info.value = bossName
@@ -340,7 +340,7 @@ end
 
 function Table:Recalculate()
     if WBCDB.lastUpdate.time then
-        WBCTableFrameLastUpdateText:SetText(WBC_CLASS_COLOR_NONE .. 'Data from ' ..
+        WBCTableFrameLastUpdateText:SetText(WBCoalition.CLASS_COLOR_NONE .. 'Data from ' ..
                                                 timeAgoToString(WBCDB.lastUpdate.time) .. ' ago, source: ' ..
                                                 (WBCDB.lastUpdate.source or '<Unkown>'))
     else
@@ -428,7 +428,7 @@ function Table:Refresh()
             rows[i].inRaidAs:SetText()
         else
             rows[i].inRaidAs:SetText(table.concat(table.map(raidMap[playerName], getClassColoredName),
-                                                  WBC_CLASS_COLOR_NONE .. ', '))
+                                                  WBCoalition.CLASS_COLOR_NONE .. ', '))
         end
 
         if not playerName or not players[playerName] or not players[playerName].alts then
@@ -437,7 +437,7 @@ function Table:Refresh()
             local justAlts = {}
             local playerAlts = players[playerName].alts
             for j = 2, #playerAlts do table.insert(justAlts, playerAlts[j]) end
-            rows[i].alts:SetText(table.concat(table.map(justAlts, getClassColoredName), WBC_CLASS_COLOR_NONE .. ', '))
+            rows[i].alts:SetText(table.concat(table.map(justAlts, getClassColoredName), WBCoalition.CLASS_COLOR_NONE .. ', '))
         end
 
         if not playerName or not plusInTheChat[playerName] then

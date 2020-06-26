@@ -1,11 +1,10 @@
 WBCoalition.Tracker = {}
-
-Tracker = WBCoalition.Tracker
+local Tracker = WBCoalition.Tracker
 
 local isWBoss = {
 }
-for i=1,#WBC_BOSS_NAMES do
-    isWBoss[WBC_BOSS_NAMES[i]] = true
+for i=1,#WBCoalition.BOSS_NAMES do
+    isWBoss[WBCoalition.BOSS_NAMES[i]] = true
 end
 
 

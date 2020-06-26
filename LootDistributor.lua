@@ -1,7 +1,5 @@
 WBCoalition.LootDistributor = {}
-
-LootDistributor = WBCoalition.LootDistributor
-
+local LootDistributor = WBCoalition.LootDistributor
 
 local itemList = {
     -- Azuregos
@@ -119,7 +117,7 @@ function LootDistributor:OnLootMessage(...)
 
         local zone = GetRealZoneText()
         local bossName = '<Unknown>'
-        for _, name in pairs(WBC_BOSS_NAMES) do
+        for _, name in pairs(WBCoalition.BOSS_NAMES) do
             if WBCCache.tracks[name] and WBCCache.tracks[name].zone == zone then bossName = name end
         end
 
@@ -136,7 +134,7 @@ function LootDistributor:OnLootOpened()
     local targetName = GetUnitName('target')
 
     local isWorldBoss = false
-    for i = 1, #WBC_BOSS_NAMES do if targetName == WBC_BOSS_NAMES[i] then isWorldBoss = true end end
+    for i = 1, #WBCoalition.BOSS_NAMES do if targetName == WBCoalition.BOSS_NAMES[i] then isWorldBoss = true end end
 
     if not isWorldBoss then return end
 
