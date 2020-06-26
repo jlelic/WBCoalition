@@ -1,10 +1,12 @@
-WBCScoutScanner = {}
+WBCoalition.ScoutScanner = {}
+
+local Scanner = WBCoalition.ScoutScanner
 
 local ENEMIES = {{'Praxis', 'Legacy', 'A Bards Tale'}}
 
 local WBC
 
-local Scanner = WBCScoutScanner
+local Scanner = WBCoalition.ScoutScanner
 
 local isScanning = false
 

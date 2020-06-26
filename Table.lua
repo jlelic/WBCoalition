@@ -1,4 +1,5 @@
-WBCTable = {}
+WBCoalition.Table = {}
+Table = WBCoalition.Table
 
 local players = {}
 local altMap = {}
@@ -66,7 +67,7 @@ local function createDropdown(node)
     info.text = 'Sync data'
     info.notCheckable = true
     info.func = function()
-        WBCSync:SyncWith(name)
+        WBCoalition.Sync:SyncWith(name)
     end
     UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL)
 
@@ -185,8 +186,77 @@ local function filterPlayer(player, filter)
     return true
 end
 
+function WBC_InitBossDropDown()
 
-function WBCTable:Initialize()
+    local selectedValue = UIDropDownMenu_GetSelectedValue(InterfaceOptionsActionBarsPanelPickupActionKeyDropDown)
+	local info = UIDropDownMenu_CreateInfo()
+
+    info.text = '- Highlight Interest -'
+    --       info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
+    info.value = ''
+    info.notCheckable = true
+    UIDropDownMenu_AddButton(info)
+   
+
+    for bossName, data in pairs(WBC_BOSS_DATA) do
+        info.text = '    '  .. data.color .. bossName .. '    '
+ --       info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
+        info.value = bossName
+        UIDropDownMenu_AddButton(info)
+    end
+
+
+	info.text = ALT_KEY;
+	info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
+	info.value = "ALT";
+	if ( info.value == selectedValue ) then
+		info.checked = 1;
+	else
+		info.checked = nil;
+	end
+	info.tooltipTitle = ALT_KEY;
+	info.tooltipText = OPTION_TOOLTIP_PICKUP_ACTION_ALT_KEY;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = CTRL_KEY;
+	info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
+	info.value = "CTRL";
+	if ( info.value == selectedValue ) then
+		info.checked = 1;
+	else
+		info.checked = nil;
+	end
+	info.tooltipTitle = CTRL_KEY;
+	info.tooltipText = OPTION_TOOLTIP_PICKUP_ACTION_CTRL_KEY;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = SHIFT_KEY;
+	info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
+	info.value = "SHIFT";
+	if ( info.value == selectedValue ) then
+		info.checked = 1;
+	else
+		info.checked = nil;
+	end
+	info.tooltipTitle = SHIFT_KEY;
+	info.tooltipText = OPTION_TOOLTIP_PICKUP_ACTION_SHIFT_KEY;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = NONE_KEY;
+	info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
+	info.value = "NONE";
+	if ( info.value == selectedValue ) then
+		info.checked = 1;
+	else
+		info.checked = nil;
+	end
+	info.tooltipTitle = NONE_KEY;
+	info.tooltipText = OPTION_TOOLTIP_PICKUP_ACTION_NONE_KEY;
+	UIDropDownMenu_AddButton(info);
+end
+
+
+function Table:Initialize()
     for i = 1, PAGE_SIZE do
         rowName = 'WBCTablePlayerHistoryFrameListFrameLine' .. tostring(i)
         row = {}
@@ -201,32 +271,32 @@ function WBCTable:Initialize()
     table.insert(UISpecialFrames, "WBCTableFrame")
     table.insert(UISpecialFrames, "WBCLoadFrame")
 
-    WBCTable:UpdateRaidInfo()
+    Table:UpdateRaidInfo()
     scrollView = WBCTableTabFrameTabContentFrameScrollFrame
 end
 
-function WBCTable:RaidOnlyToggled()
+function Table:RaidOnlyToggled()
     if WBCTableInRaidCheckbox:GetChecked() then
-        WBCTable:UpdateRaidInfo()
+        Table:UpdateRaidInfo()
         WBCTableNotInRaidCheckbox:SetChecked(false)
     end
-    WBCTable:Recalculate()
+    Table:Recalculate()
 end
 
-function WBCTable:RaidOnlyNotToggled()
+function Table:RaidOnlyNotToggled()
     if WBCTableNotInRaidCheckbox:GetChecked() then
-        WBCTable:UpdateRaidInfo()
+        Table:UpdateRaidInfo()
         WBCTableInRaidCheckbox:SetChecked(false)
     end
-    WBCTable:Recalculate()
+    Table:Recalculate()
 end
 
-function WBCTable:ClearPluses()
+function Table:ClearPluses()
     plusInTheChat = {}
-    WBCTable:Recalculate()
+    Table:Recalculate()
 end
 
-function WBCTable:ReportPluses()
+function Table:ReportPluses()
     local candidateList = {}
 
     local playerList = table.keys(players)
@@ -264,9 +334,11 @@ function WBCTable:ReportPluses()
     end
 end
 
-function WBCTable:Filter() WBCTable:Recalculate() end
+function Table:Filter()
+    Table:Recalculate()
+end
 
-function WBCTable:Recalculate()
+function Table:Recalculate()
     if WBCDB.lastUpdate.time then
         WBCTableFrameLastUpdateText:SetText(WBC_CLASS_COLOR_NONE .. 'Data from ' ..
                                                 timeAgoToString(WBCDB.lastUpdate.time) .. ' ago, source: ' ..
@@ -335,10 +407,10 @@ function WBCTable:Recalculate()
     end
 
     table.sort(playerDisplayOrder, sorters[sortBy])
-    WBCTable:Refresh()
+    Table:Refresh()
 end
 
-function WBCTable:Refresh()
+function Table:Refresh()
     FauxScrollFrame_Update(scrollView, #playerDisplayOrder, PAGE_SIZE, ROW_HEIGHT)
     local offset = FauxScrollFrame_GetOffset(scrollView)
     local serverTime = GetServerTime()
@@ -378,17 +450,17 @@ function WBCTable:Refresh()
     end
 end
 
-function WBCTable:SetSortColumn(buttonName)
+function Table:SetSortColumn(buttonName)
     sortBy = SORT[buttonName]
-    WBCTable:Recalculate()
+    WBCoalition.Table:Recalculate()
 end
 
-function WBCTable:Show()
-    WBCTable:Recalculate()
+function Table:Show()
+    WBCoalition.Table:Recalculate()
     WBCTableFrame:Show()
 end
 
-function WBCTable:ShowDropDown(node, button)
+function Table:ShowPlayerDropDown(node, button)
     if button ~= "RightButton" or not node.playerName then return end
     GameTooltip:Hide()
     local cursor = GetCursorPosition() / UIParent:GetEffectiveScale()
@@ -400,7 +472,7 @@ function WBCTable:ShowDropDown(node, button)
     ToggleDropDownMenu(1, nil, WBCTableDropDownMenu)
 end
 
-function WBCTable:ParseInput()
+function Table:ParseInput()
     local decoded = dec(WBCLoadEditBox:GetText())
     if string.sub(decoded, 1, 9) == 'Coalition' then
         WBCLoadFrame:Hide()
@@ -446,14 +518,14 @@ function WBCTable:ParseInput()
         WBCDB.players = players
         WBCDB.lastUpdate = {time = lastUpdate, source = '<Sheet>'}
         WBCDB.altMap = altMap
-        WBCTable:Recalculate()
-        WBCSync:OnNewDataLoaded()
+        WBCoalition.Table:Recalculate()
+        WBCoalition.Sync:OnNewDataLoaded()
     end
 end
 
-function WBCTable:ShowInterestedToggled() WBCTable:Recalculate() end
+function Table:ShowInterestedToggled() Table:Recalculate() end
 
-function WBCTable:UpdateRaidInfo()
+function Table:UpdateRaidInfo()
     raid = {}
     raidMap = {}
     altMap = WBCDB.altMap
@@ -473,65 +545,3 @@ function WBCTable:UpdateRaidInfo()
         end
     end
 end
-
-local function processEvent(event, type, ...)
-    if type == 'VARIABLES_LOADED' then
-        WBCDB = WBCDB or {}
-        WBCDB.players = WBCDB.players or {}
-        WBCDB.lastUpdate = WBCDB.lastUpdate or {time = nil, source = nil}
-        WBCDB.altMap = WBCDB.altMap or {}
-
-        WBCCache = WBCCache or {}
-        WBCCache.classes = WBCCache.classes or {}
-        WBCCache.tracks = WBCCache.tracks or {}
-        WBCCache.lootLog = WBCCache.lootLog or {}
-        
-        WBCTable:Initialize()
-        WBCoalition:Initialize()
-        WBCSync:Initialize()
-        WBCTable:UpdateRaidInfo()
-        WBCTable:Recalculate()
-    elseif type == 'CHAT_MSG_RAID' or type == 'CHAT_MSG_RAID_LEADER' or type == 'CHAT_MSG_PARTY' or type ==
-        'CHAT_MSG_PARTY_LEADER' or type == 'CHAT_MSG_WHISPER' then
-        local msg, sender = ...
-        local name = splitString(sender, '-')[1]
-        if string.sub(msg, 1, 1) == '+' then
-            local senderName = splitString(sender, '-')[1]
-            local mainName = altMap[name]
-            if mainName then name = mainName end
-            plusInTheChat[name] = {msg = msg, sender = senderName}
-            WBCTable:Recalculate()
-        end
-        if type == 'CHAT_MSG_WHISPER' then WBCInviteHelper:OnWhisper(name, msg) end
-    elseif type == 'GROUP_ROSTER_UPDATE' then
-        WBCTable:UpdateRaidInfo()
-        WBCTable:Recalculate()
-        WBCSync:OnRaidStatusChange()
-    elseif type == 'WHO_LIST_UPDATE' then
-        WBCScoutScanner:OnWhoResult()
-    elseif type == 'LOOT_OPENED' then
-        WBCLootDistributor:OnLootOpened()
-    elseif type == 'CHAT_MSG_LOOT' then
-        WBCLootDistributor:OnLootMessage(...)
-    elseif type == 'PLAYER_TARGET_CHANGED' then
-        WBCTracker:OnTargetChanged()
-    end
-end
-
-function WBCTable:Start()
-    if WBCTableFrame == nil then return end
-    WBCTableFrame:RegisterEvent('VARIABLES_LOADED')
-    WBCTableFrame:RegisterEvent('CHAT_MSG_RAID')
-    WBCTableFrame:RegisterEvent('CHAT_MSG_RAID_LEADER')
-    WBCTableFrame:RegisterEvent('CHAT_MSG_PARTY')
-    WBCTableFrame:RegisterEvent('CHAT_MSG_PARTY_LEADER')
-    WBCTableFrame:RegisterEvent('CHAT_MSG_WHISPER')
-    WBCTableFrame:RegisterEvent('GROUP_ROSTER_UPDATE')
-    WBCTableFrame:RegisterEvent('WHO_LIST_UPDATE')
-    WBCTableFrame:RegisterEvent('LOOT_OPENED')
-    WBCTableFrame:RegisterEvent('PLAYER_TARGET_CHANGED')
-    WBCTableFrame:RegisterEvent('CHAT_MSG_LOOT')
-    WBCTableFrame:SetScript('OnEvent', processEvent)
-end
-
-WBCTable:Start()

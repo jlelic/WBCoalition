@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
     <Frame name="WBCTableDropDownMenu" inherits="UIDropDownMenuTemplate" hidden="true">
         <Size />
@@ -62,14 +62,14 @@
         </Frames>
         <Scripts>
             <OnEnter>
-				<!-- TODO Spy:ShowTooltip(self, true)	-->
+                <!-- TODO Spy:ShowTooltip(self, true)	-->
             </OnEnter>
             <OnLeave>
-				<!-- TODO Spy:ShowTooltip(self, false)	-->
+                <!-- TODO Spy:ShowTooltip(self, false)	-->
             </OnLeave>
             <OnMouseUp>
                 <!--                Spy:ShowUnitDropDown(self, button)  DO NOT DELETE THIS  -->
-                WBCTable:ShowDropDown(self, button)
+                WBCoalition.Table:ShowPlayerDropDown(self, button)
             </OnMouseUp>
         </Scripts>
         <HighlightTexture file="Interface\FriendsFrame\UI-FriendsFrame-HighlightBar" />
@@ -87,7 +87,7 @@
         <NormalFont style="GameFontNormal" />
         <Scripts>
             <OnClick>
-                WBCTable:SetSortColumn(self:GetName())				
+                WBCoalition.Table:SetSortColumn(self:GetName())				
             </OnClick>
         </Scripts>
     </Button>
@@ -230,6 +230,27 @@
             </Layer>
         </Layers>
         <Frames>
+            <Frame name="$parentPickupActionKeyDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="0" y="-8" />
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+                        UIDropDownMenu_Initialize(self, WBC_InitBossDropDown)
+                    </OnLoad>
+                    <OnEnter>
+                        <!--                       if ( not self.isDisabled ) then
+                      GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+                      GameTooltip:SetText(self.tooltip, nil, nil, nil, nil, true);
+                      end
+ -->
+                    </OnEnter>
+                    <!--                     <OnLeave function="GameTooltip_Hide" />
+ -->
+                </Scripts>
+            </Frame>
             <Frame name="$parentIcon">
                 <Size x="80" y="80" />
                 <Anchors>
@@ -293,8 +314,8 @@
                             </OnLoad>
                             <OnClick>
                                 PanelTemplates_SetTab(self:GetParent(), 1)
-								WBCTable:UpdateView()
-                                WBCTable:Recalulate()
+								WBCoalition.Table:UpdateView()
+                                WBCoalition.Table:Recalulate()
                                 <!--                                PlaySound("igCharacterInfoTab") Error in v7.3 -->
                             </OnClick>
                         </Scripts>
@@ -310,11 +331,11 @@
                                 self.timer = 0
                             </OnLoad>
                             <OnUpdate>
-                                <!-- TODO WBCTable:OnRefreshButtonUpdate(self, elapsed) -->
+                                <!-- TODO WBCoalition.Table:OnRefreshButtonUpdate(self, elapsed) -->
                             </OnUpdate>
                             <OnClick>
                                 <!--                                PlaySound("igMainMenuOptionCheckBoxOn") Error in v7.3-->
-                                WBCTable:ReportPluses()
+                                WBCoalition.Table:ReportPluses()
                             </OnClick>
                         </Scripts>
                     </Button>
@@ -329,11 +350,11 @@
                                 self.timer = 0
                             </OnLoad>
                             <OnUpdate>
-                                <!-- TODO WBCTable:OnRefreshButtonUpdate(self, elapsed) -->
+                                <!-- TODO WBCoalition.Table:OnRefreshButtonUpdate(self, elapsed) -->
                             </OnUpdate>
                             <OnClick>
                                 <!--                                PlaySound("igMainMenuOptionCheckBoxOn") Error in v7.3-->
-                                WBCTable:ClearPluses()
+                                WBCoalition.Table:ClearPluses()
                             </OnClick>
                         </Scripts>
                     </Button>
@@ -675,7 +696,7 @@
                         self:ClearFocus()
                     </OnEscapePressed>
                     <OnTextChanged>
-                        WBCTable:Filter()
+                        WBCoalition.Table:Filter()
                     </OnTextChanged>
                 </Scripts>
                 <FontString inherits="GameFontHighlight">
@@ -697,7 +718,7 @@
                 </HitRectInsets>
                 <Scripts>
                     <OnClick>
-                        WBCTable:RaidOnlyToggled()
+                        WBCoalition.Table:RaidOnlyToggled()
                     </OnClick>
                 </Scripts>
             </CheckButton>
@@ -715,7 +736,7 @@
                 </HitRectInsets>
                 <Scripts>
                     <OnClick>
-                        WBCTable:RaidOnlyNotToggled()
+                        WBCoalition.Table:RaidOnlyNotToggled()
                     </OnClick>
                 </Scripts>
             </CheckButton>
@@ -733,7 +754,7 @@
                 </HitRectInsets>
                 <Scripts>
                     <OnClick>
-                        WBCTable:ShowInterestedToggled()
+                        WBCoalition.Table:ShowInterestedToggled()
                     </OnClick>
                 </Scripts>
             </CheckButton>
@@ -887,7 +908,7 @@
                                 <FontString inherits="ChatFontNormal" />
                                 <Scripts>
                                     <OnTextChanged>
-                                        WBCTable:ParseInput()
+                                        WBCoalition.Table:ParseInput()
                                     </OnTextChanged>
                                 </Scripts>
                             </EditBox>

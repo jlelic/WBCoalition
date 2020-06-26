@@ -7,12 +7,13 @@
 ## SavedVariablesPerCharacter: WBCIcon 
 
 lib/embeds.xml
+EventFrame.xml
 WBCoalition.lua
-WBCTracker.lua
-WBCTable.xml
-WBCTable.lua
-WBCLootLog.xml
-WBCScoutScanner.lua
-WBCInviteHelper.lua
-WBCLootDistributor.lua
-WBCSync.lua
+Tracker.lua
+Table.lua
+Table.xml
+LootLog.xml
+ScoutScanner.lua
+InviteHelper.lua
+LootDistributor.lua
+Sync.lua

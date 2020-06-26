@@ -1,4 +1,6 @@
-WBCInviteHelper = {}
+WBCoalition.InviteHelper = {}
+
+InviteHelper = WBCoalition.InviteHelper
 
 local function shouldInvite(msg)
     local msgLower = strlower(msg)
@@ -31,7 +33,7 @@ local function getPointsFor(name)
     return WBCDB.players[mainName].points, mainName
 end
 
-function WBCInviteHelper:OnWhisper(name, msg)
+function InviteHelper:OnWhisper(name, msg)
     if shouldInvite(msg) then
         local points, mainName = getPointsFor(name)
         if points == nil then return end

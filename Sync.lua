@@ -1,4 +1,6 @@
-WBCSync = {}
+WBCoalition.Sync = {}
+
+local Sync = WBCoalition.Sync
 
 local WBC_PREFIX = 'WBCoa'
 local WBC_DATA_PREFIX = 'WBCData'
@@ -155,7 +157,7 @@ local function onDataReceived(prefix, compressedMsg, channel, sender)
     WBCDB.altMap = newAltMap
     WBCDB.lastUpdate.time = lastUpdate
     WBCDB.lastUpdate.source = sender
-    WBCTable:Recalculate()
+    WBCoalition.Table:Recalculate()
 
     if fsyncState == FORCE_SYNC_STATE.offer then
         WBCoalition:Log(FORCE_SYNC_COLOR_OK .. 'Received update from ' .. senderDetailed)
@@ -172,28 +174,28 @@ local function onDataReceived(prefix, compressedMsg, channel, sender)
 
 end
 
-function WBCSync:Initialize()
+function Sync:Initialize()
     aceComm = LibStub:GetLibrary("AceComm-3.0")
     aceComm:RegisterComm(WBC_PREFIX, onCommReceived)
     aceComm:RegisterComm(WBC_DATA_PREFIX, onDataReceived)
 
     deflate = LibStub:GetLibrary("LibDeflate")
 
-    C_Timer.After(5, function() WBCSync:OnRaidStatusChange() end)
+    C_Timer.After(5, function() Sync:OnRaidStatusChange() end)
     if IsInGuild() then C_Timer.After(15, function() sendOffer('GUILD') end) end
 end
 
-function WBCSync:OnRaidStatusChange()
+function Sync:OnRaidStatusChange()
     if not wasInRaid and IsInRaid() then sendOffer('RAID') end
     wasInRaid = IsInRaid()
 end
 
-function WBCSync:OnNewDataLoaded()
+function Sync:OnNewDataLoaded()
     if IsInRaid() then sendOffer('RAID') end
     if IsInGuild() then C_Timer.After(10, function() sendOffer('GUILD') end) end
 end
 
-function WBCSync:SyncWith(mainName)
+function Sync:SyncWith(mainName)
     if forceSyncStates[mainName] then
         WBCoalition:LogError('Syncing with ' .. mainName .. ' already in progress')
         return

@@ -1,4 +1,7 @@
-WBCLootDistributor = {}
+WBCoalition.LootDistributor = {}
+
+LootDistributor = WBCoalition.LootDistributor
+
 
 local itemList = {
     -- Azuregos
@@ -56,9 +59,9 @@ local function showUsage()
     WBCoalition:Log('/wbc |cffa334ee[Item Link]|r roll')
 end
 
-function WBCLootDistributor:ClearLog() StaticPopup_Show(DIALOG_CONFIRM_CLEAR) end
+function LootDistributor:ClearLog() StaticPopup_Show(DIALOG_CONFIRM_CLEAR) end
 
-function WBCLootDistributor:SetLootLogText()
+function LootDistributor:SetLootLogText()
     local texts = {}
     local lootLog = WBCCache.lootLog
     for i=#lootLog,1,-1 do
@@ -70,7 +73,7 @@ function WBCLootDistributor:SetLootLogText()
     WBCLootLogEditBox:SetText(table.concat(texts, '\n'))
 end
 
-function WBCLootDistributor:OnCommand(cmd)
+function LootDistributor:OnCommand(cmd)
     local linkEndIndex = string.find(cmd, '|r')
     local cmdValid = cmd ~= '' and linkEndIndex
     if cmdValid then
@@ -79,7 +82,7 @@ function WBCLootDistributor:OnCommand(cmd)
             local lootMethod = lootMethodMap[cmdMethod]
             if lootMethod then
                 if IsInRaid() and (UnitIsRaidOfficer('player') or UnitIsGroupLeader('player')) then
-                    WBCTable:ClearPluses()
+                    Table:ClearPluses()
                     local msg = ' /roll'
                     if lootMethod == LOOT_METHOD_BUY then
                         msg = ' + in the raid chat or whisper if you want to buy with points'
@@ -105,7 +108,7 @@ function WBCLootDistributor:OnCommand(cmd)
     end
 end
 
-function WBCLootDistributor:OnLootMessage(...)
+function LootDistributor:OnLootMessage(...)
     local message, _, _, _, player = ...
     if string.find(message, "receive") then
         local playerNameUpper = string.upper(player)
@@ -116,7 +119,7 @@ function WBCLootDistributor:OnLootMessage(...)
 
         local zone = GetRealZoneText()
         local bossName = '<Unknown>'
-        for _, name in pairs(WBC_WORLD_BOSSES) do
+        for _, name in pairs(WBC_BOSS_NAMES) do
             if WBCCache.tracks[name] and WBCCache.tracks[name].zone == zone then bossName = name end
         end
 
@@ -125,7 +128,7 @@ function WBCLootDistributor:OnLootMessage(...)
     end
 end
 
-function WBCLootDistributor:OnLootOpened()
+function LootDistributor:OnLootOpened()
     if not IsMasterLooter() then return end
     local numItems = GetNumLootItems()
     local lootSourceId = GetLootSourceInfo(1)
@@ -133,7 +136,7 @@ function WBCLootDistributor:OnLootOpened()
     local targetName = GetUnitName('target')
 
     local isWorldBoss = false
-    for i = 1, #WBC_WORLD_BOSSES do if targetName == WBC_WORLD_BOSSES[i] then isWorldBoss = true end end
+    for i = 1, #WBC_BOSS_NAMES do if targetName == WBC_BOSS_NAMES[i] then isWorldBoss = true end end
 
     if not isWorldBoss then return end
 

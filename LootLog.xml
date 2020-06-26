@@ -86,7 +86,7 @@
                        self:SetFrameLevel(WBCLootLog:GetFrameLevel() + 1) 
                     </OnLoad>
                     <OnClick>
-                        WBCLootDistributor:ClearLog()
+                        WBCoalition.LootDistributor:ClearLog()
                     </OnClick>
                 </Scripts>
             </Button>
@@ -150,10 +150,10 @@
                                         self:SetAutoFocus(false)
                                     </OnLoad>
                                     <OnShow>
-                                        WBCLootDistributor:SetLootLogText()
+                                        WBCoalition.LootDistributor:SetLootLogText()
                                     </OnShow>
                                     <OnTextChanged>
-                                        WBCLootDistributor:SetLootLogText()
+                                        WBCoalition.LootDistributor:SetLootLogText()
                                     </OnTextChanged>
                                     <OnEscapePressed>
                                         self:ClearFocus()
