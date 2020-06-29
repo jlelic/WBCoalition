@@ -6,8 +6,6 @@ local competitors = {
     {'Redrum Inc', 'RR Inc', 'Solid', 'CORE', 'Ember', 'Close to Insanity', 'Scarlet Crusade'}
 }
 
-local WBC
-
 local isScanning = false
 
 local ZONES = {'Azshara', 'Blasted Lands', 'Ashenvale', 'Feralas', 'Duskwood', 'The Hinterlands'}
@@ -45,32 +43,32 @@ local function reportPlayerInfo(index, playerInfo)
     if playerInfo.level < 60 then
         levelColor = ' |cff33aa33'
     end
-    WBC:Log('        ' .. index .. '. ' .. ' |c' .. classColor .. playerInfo.name  .. levelColor.. playerInfo.level .. '|cffffffff, ' .. playerInfo.guild)
+    WBCoalition:Log('        ' .. index .. '. ' .. ' |c' .. classColor .. playerInfo.name  .. levelColor.. playerInfo.level .. '|cffffffff, ' .. playerInfo.guild)
 end
 
 local function reportResults()
-    WBC:Log('-- RESULTS --')
+    WBCoalition:Log('-- RESULTS --')
     for i=1,#results do
         local zoneInfo = results[i]
-        WBC:Log('|cffffffcc' .. zoneInfo.name)
-        WBC:Log('   Coalition:')
+        WBCoalition:Log('|cffffffcc' .. zoneInfo.name)
+        WBCoalition:Log('   Coalition:')
         for j=1,#zoneInfo.scouts do
             local scout = zoneInfo.scouts[j]
             reportPlayerInfo(j, scout)
         end
         if #zoneInfo.scouts == 0 then
-            WBC:Log('   |cffff0000We are missing scouts in ' .. zoneInfo.name .. '!')
+            WBCoalition:Log('   |cffff0000We are missing scouts in ' .. zoneInfo.name .. '!')
         end
         for c=1,#competitors do
             local competitorLeader = competitors[c][1]
             if #zoneInfo.competitors[c] > 0 then
-                WBC:Log('   ' .. competitorLeader ..':')
+                WBCoalition:Log('   ' .. competitorLeader ..':')
                 for j=1,#zoneInfo.competitors[c] do
                     local scout = zoneInfo.competitors[c][j]
                     reportPlayerInfo(j, scout)
                 end
             else
-                WBC:Log('   |cffff0000' .. competitorLeader .. ' is missing scouts in ' .. zoneInfo.name .. '!')
+                WBCoalition:Log('   |cffff0000' .. competitorLeader .. ' is missing scouts in ' .. zoneInfo.name .. '!')
             end
         end
     end
@@ -130,7 +128,7 @@ StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
         FriendsFrame:UnregisterEvent("WHO_LIST_UPDATE")
         C_FriendList.SendWho(zone)
         try = try + 1
-        WBC:Log('Scanning ' .. zone .. '...')
+        WBCoalition:Log('Scanning ' .. zone .. '...')
         C_Timer.After(3, function()
             if gotResultsFor < zoneIndex then
                 scanNextZone()
@@ -159,15 +157,12 @@ function Scanner:OnWhoResult()
     zoneIndex = zoneIndex + 1
     if zoneIndex > #ZONES then
         isScanning = false
-        WBC:Log('Scan completed')
         reportResults()
     end
     scanNextZone()
 end
 
 function Scanner:Scan()
-    WBC = WBCoalition
-    WBC:Log('Scan initiated')
     results = {}
     isScanning = true
     zoneIndex = 1
