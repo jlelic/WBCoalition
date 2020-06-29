@@ -63,10 +63,10 @@ local function reportResults()
         end
         for c=1,#competitors do
             local competitorLeader = competitors[c][1]
-            if #zoneInfo.enemies[c] > 0 then
+            if #zoneInfo.competitors[c] > 0 then
                 WBC:Log('   ' .. competitorLeader ..':')
-                for j=1,#zoneInfo.enemies[c] do
-                    local scout = zoneInfo.enemies[c][j]
+                for j=1,#zoneInfo.competitors[c] do
+                    local scout = zoneInfo.competitors[c][j]
                     reportPlayerInfo(j, scout)
                 end
             else
