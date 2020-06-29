@@ -15,7 +15,7 @@ local ZONES = {'Azshara', 'Blasted Lands', 'Ashenvale', 'Feralas', 'Duskwood', '
 local results = {}
 local zoneIndex = 0
 local gotResultsFor = 0
-local try = 0
+local try = 1
 
 local DIALOG_CONTINUE_SCANNING = 'DIALOG_WBC_CONTINUE_SCANNING'
 
@@ -111,7 +111,7 @@ local function scanNextZone()
 
     local zone = ZONES[zoneIndex]
     local msg = 'Scanning ' .. zone
-    if try > 0 then
+    if try > 1 then
         msg = msg .. ' (attempt ' .. try .. ')'
     end
     msg = msg .. '\n' .. zoneIndex .. '/' .. #ZONES
@@ -153,7 +153,7 @@ function Scanner:OnWhoResult()
     FriendsFrame:RegisterEvent("WHO_LIST_UPDATE")
     saveWhoResults()
     local zone = ZONES[zoneIndex]
-    try = 0
+    try = 1
     gotResultsFor = zoneIndex
     zoneIndex = zoneIndex + 1
     if zoneIndex > #ZONES then
