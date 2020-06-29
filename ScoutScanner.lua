@@ -26,7 +26,7 @@ local function isScout(name)
     return false
 end
 
-local function isEnemyCoalition(name,guild)
+local function isCompetitor(name,guild)
     if name == 'Kimeera' then return 1 end
     for i=1,#competitors do
         for j=1,#competitors[i] do
@@ -61,14 +61,14 @@ local function reportResults()
         if #zoneInfo.scouts == 0 then
             WBC:Log('   |cffff0000We are missing scouts in ' .. zoneInfo.name .. '!!')
         end
-        for enemy=1,#competitors do
-            local competitorLeader = competitors[enemy][0]
+        for c=1,#competitors do
+            local competitorLeader = competitors[c][0]
             WBC:Log('   ' .. competitorLeader ..' Coalition:')
-            for j=1,#zoneInfo.enemies[enemy] do
-                local scout = zoneInfo.enemies[enemy][j]
+            for j=1,#zoneInfo.enemies[c] do
+                local scout = zoneInfo.enemies[c][j]
                 reportPlayerInfo(j, scout)
             end
-            if #zoneInfo.enemies[enemy] == 0 then
+            if #zoneInfo.enemies[c] == 0 then
                 WBC:Log('   |cffff0000' .. competitorLeader .. ' is missing scouts in ' .. zoneInfo.name .. '!!')
             end
         end
@@ -77,9 +77,9 @@ end
 
 local function saveWhoResults()
     local x, total = C_FriendList.GetNumWhoResults()
-    local zoneInfo = {name = ZONES[zoneIndex], scouts={}, enemies={}, total = total}
+    local zoneInfo = {name = ZONES[zoneIndex], scouts={}, competitors={}, total = total}
     for i=1,#competitors do
-        table.insert(zoneInfo.enemies, {})
+        table.insert(zoneInfo.competitors, {})
     end
     for i=1,total do
         local info = C_FriendList.GetWhoInfo(i)
@@ -96,9 +96,9 @@ local function saveWhoResults()
         if isScout(name) then
             table.insert(zoneInfo.scouts, playerInfo)
         end
-        local enemyCoalition = isEnemyCoalition(name, guild)
-        if enemyCoalition > 0 then
-            table.insert(zoneInfo.enemies[enemyCoalition], playerInfo)
+        local competitor = isCompetitor(name, guild)
+        if competitor > 0 then
+            table.insert(zoneInfo.competitors[competitor], playerInfo)
         end
     end
     table.insert(results, zoneInfo)
