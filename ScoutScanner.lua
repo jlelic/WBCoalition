@@ -109,7 +109,7 @@ local function scanNextZone()
     local zone = ZONES[zoneIndex]
     local msg = 'Scanning ' .. zone
     if try > 0 then
-        msg = ' (attempt ' .. try .. ')'
+        msg = msg .. ' (attempt ' .. try .. ')'
     end
     msg = msg .. '\n' .. zoneIndex .. '/' .. #ZONES
 
