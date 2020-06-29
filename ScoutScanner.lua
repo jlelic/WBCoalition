@@ -122,7 +122,7 @@ end
 
 StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
     text = '%s',
-    button1 = 'Run scan',
+    button1 = 'Scan',
     button2 = 'Stop',
     OnAccept = function(self, data)
         local zone = ZONES[zoneIndex]
@@ -167,6 +167,7 @@ end
 
 function Scanner:Scan()
     WBC = WBCoalition
+    WBC:Log('Scan initiated')
     results = {}
     isScanning = true
     zoneIndex = 1
