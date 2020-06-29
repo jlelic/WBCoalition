@@ -1,12 +1,9 @@
 WBCoalition.ScoutScanner = {}
-
 local Scanner = WBCoalition.ScoutScanner
 
 local ENEMIES = {{'Praxis', 'Legacy', 'A Bards Tale'}}
 
 local WBC
-
-local Scanner = WBCoalition.ScoutScanner
 
 local isScanning = false
 
@@ -121,7 +118,6 @@ StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
     button1 = 'Continue scanning',
     button2 = 'Stop',
     OnAccept = function(self, data)
-        local currentIndex = zoneIndex
         local zone = ZONES[zoneIndex]
         C_FriendList.SetWhoToUi(true)
         FriendsFrame:UnregisterEvent("WHO_LIST_UPDATE")
