@@ -1,32 +1,26 @@
 WBCoalition.LootDistributor = {}
 local LootDistributor = WBCoalition.LootDistributor
 
-local itemList = {
-    -- Azuregos
-    "Crystal Adorned Crown", "Drape of Benediction", "Puissant Cape", "Unmelting Ice Girdle",
-    "Leggins of Arcane Supremacy", "Snowblind Shoes", "Cold Snap", "Fand of the Mystics", "Eshhandar's Left Claw",
-    "Typhoon", "Mature Blue Dragon Sinew", -- Kazzak
-    "Infernal Headcage", "Blazefury Medallion", "Eskhandar's Pelt", "Blacklight Bracer", "Doomhide Gauntlets",
-    "Flayed Doomguard Belt", "Fel Infused Leggins", "Ring of Entropy", "Empyrean Demolisher", "Amberseal Keeper",
-    "The Eye of Shadow", -- Lethon
-    "Deviate Growth Cap", "Black Bark Wristbands", "Gauntlets of the Shining Light", "Belt of the Dark Bog",
-    "Dark Heart Pants", "Malignant Footguards", -- Emeriss
-    "Circlet of Restless Dreams", "Dragonheart Necklace", "Ring of the Unliving", "Boots of the Endless Moor",
-    "Polished Ironwood Crossbow", -- Taerar
-    "Unnatural Leather Spaulders", "Mendicant's Slippers", "Boots of Fright", "Mindtear Band", "Nightmare Blade",
 
-    -- Ysondre
-    "Acid Inscribed Pauldrons", "Jade Inlaid Vestments", "Leggins of the Demented Mind", "Strangely Glyphed Legplates",
-    "Hibernation Crystal", "Emerald Dragonfang", -- All emerald dragons
-    "Green Dragonskin Cloak", "Dragonspur Wraps", "Dragonbone Wristguards", "Gloves of Delusional Power",
-    "Ancient Corroded Leggins", "Acid Inscribed Greaves", "Trance Stone", "Nightmare Engulfed Object",
-    "Hammer of Bestial Fury", "Staff of Rampant Growth"
-}
+
+local function uniq(t)
+    local result = {}
+    local hash = {}
+
+    for _,v in pairs(t) do
+        if (not hash[v]) then
+            table.insert(result, v)
+            hash[v] = true
+        end
+     end
+
+     return result
+end
 
 local LOOT_METHOD_BUY = 'buy'
 local LOOT_METHOD_ROLL = 'roll'
 
-lootMethodMap = {
+local lootMethodMap = {
     ['+'] = LOOT_METHOD_BUY,
     [' +'] = LOOT_METHOD_BUY,
     ['buy'] = LOOT_METHOD_BUY,
@@ -43,9 +37,15 @@ lootMethodMap = {
 
 local DIALOG_CONFIRM_CLEAR = "WBC_DIALOG_CONFIRM_CLEAR_LOOT_LOG"
 
-local isWBossLoot = {}
+local allItemIds = {}
 
-for _, item in pairs(itemList) do isWBossLoot[item] = true end
+for boss,data in pairs(WBCoalition.BOSS_DATA) do
+    for _, itemId in ipairs(data.loot) do
+        table.insert(allItemIds, itemId)
+    end
+end
+
+allItemIds = uniq(allItemIds)
 
 local zoneMap = {}
 
@@ -55,6 +55,44 @@ local function showUsage()
     WBCoalition:Log('/wbc |cffa334ee[Item Link]|r +')
     WBCoalition:Log('or')
     WBCoalition:Log('/wbc |cffa334ee[Item Link]|r roll')
+end
+
+local function concatTables(t1, t2)
+    local result = {}
+    for i=1, (#t1 + #t2) do
+        if i <= n1 then
+            table.insert(result, t1[i])
+        else
+            table.insert(result, t2[i - #t1])
+        end
+    end
+    return result
+end
+
+local function getInterestedNames(itemId)
+    local result = {}
+
+    for name,data in pairs(WBCDB.players) do
+        for _,intestedIn in ipairs(data.lootInterest) do
+            if itemId == intestedIn then
+                table.insert(result, name)
+            end
+        end
+    end
+
+    return result
+end
+
+local function isWBossLoot(itemName)
+    if not WBCCache.isWBossLoot then 
+        WBCCache.isWBossLoot = {}
+        for _, itemId in ipairs(allItemIds) do
+            local itemName = GetItemInfo(itemId)
+            WBCCache.isWBossLoot[itemName] = true
+        end    
+    end
+
+    return WBCCache.isWBossLoot[itemName]
 end
 
 function LootDistributor:ClearLog() StaticPopup_Show(DIALOG_CONFIRM_CLEAR) end
@@ -69,6 +107,32 @@ function LootDistributor:SetLootLogText()
         table.insert(texts, text)
     end
     WBCLootLogEditBox:SetText(table.concat(texts, '\n'))
+end
+
+function LootDistributor:RecalculateLootRanks()
+    local lootRanks = {}
+
+    for _,itemId in ipairs(allItemIds) do
+        lootRanks[itemId] = {}
+        local interestedPlayers = getInterestedNames(itemId)
+        table.sort(interestedPlayers, WBCoalition.Table.Sorters['points'])
+        for index,player in ipairs(interestedPlayers) do
+            lootRanks[itemId][player] = index
+        end
+    end
+
+    for boss,data in pairs(WBCoalition.BOSS_DATA) do
+        lootRanks[boss] = {}
+        for _,itemId in ipairs(data.loot) do
+            for player,_ in pairs(WBCDB.players) do
+                if lootRanks[itemId][player] then
+                    lootRanks[boss][player] = min(lootRanks[boss][player] or 99999, lootRanks[itemId][player])
+                end
+            end
+        end
+    end
+
+    WBCDB.lootRanks = lootRanks
 end
 
 function LootDistributor:OnCommand(cmd)
@@ -113,7 +177,7 @@ function LootDistributor:OnLootMessage(...)
         local startIndex, endIndex = string.find(message, "%[.+%]")
         local itemName = string.sub(message, startIndex + 1, endIndex - 1)
 
-        if not isWBossLoot[itemName] then return end
+        if not isWBossLoot(itemName) then return end
 
         local zone = GetRealZoneText()
         local bossName = '<Unknown>'

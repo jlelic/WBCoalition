@@ -15,15 +15,16 @@ local SORT = {
 
 local playerDisplayOrder = {}
 local sortBy = 'points'
+local selectedBoss = nil
+local selectedItem = nil
 
-PAGE_SIZE = 34
-ROW_HEIGHT = 15
+local PAGE_SIZE = 34
+local ROW_HEIGHT = 15
 
 local initialized = false
 
 local scrollView
 local rows = {}
-WBCRows = rows
 
 local raid = {}
 local raidMap = {}
@@ -157,7 +158,19 @@ local function timeAgoToString(timestamp)
     end
 end
 
-local sorters = {
+local function filterPlayer(player, filter)
+    local normalizedFilter = WBCoalition:NormalizeString(filter)
+    if string.find(WBCoalition:NormalizeString(player), normalizedFilter) ~= nil then return false end
+    if players[player] and players[player].alts then
+        for i = 2, #players[player].alts do
+            local alt = players[player].alts[i]
+            if string.find(WBCoalition:NormalizeString(alt), normalizedFilter) ~= nil then return false end
+        end
+    end
+    return true
+end
+
+Table.Sorters = {
     ["name"] = function(a, b) return WBCoalition:NormalizeString(a) < WBCoalition:NormalizeString(b) end,
     ["points"] = function(a, b)
         return (players[a] and players[a].points or -1) > (players[b] and players[b].points or -1)
@@ -174,87 +187,78 @@ local sorters = {
     end
 }
 
-local function filterPlayer(player, filter)
-    local normalizedFilter = WBCoalition:NormalizeString(filter)
-    if string.find(WBCoalition:NormalizeString(player), normalizedFilter) ~= nil then return false end
-    if players[player] and players[player].alts then
-        for i = 2, #players[player].alts do
-            local alt = players[player].alts[i]
-            if string.find(WBCoalition:NormalizeString(alt), normalizedFilter) ~= nil then return false end
-        end
-    end
-    return true
-end
-
-function WBC_InitBossDropDown()
-
-    local selectedValue = UIDropDownMenu_GetSelectedValue(InterfaceOptionsActionBarsPanelPickupActionKeyDropDown)
+function WBC_InitBossDropDown(self)
 	local info = UIDropDownMenu_CreateInfo()
 
-    info.text = '- Highlight Interest -'
-    --       info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
-    info.value = ''
+    local text = WBCoalition.CLASS_COLOR_NONE .. '- Select Boss -'
+    info.text = text
+    info.value = nil
     info.notCheckable = true
+    info.func = function()
+        UIDropDownMenu_SetSelectedValue(self, nil)
+        UIDropDownMenu_SetText(self, text)
+        Table:BossDropDownChanged(nil)
+    end
     UIDropDownMenu_AddButton(info)
    
+    UIDropDownMenu_SetText(self, text)
 
     for bossName, data in pairs(WBCoalition.BOSS_DATA) do
-        info.text = '    '  .. data.color .. bossName .. '    '
- --       info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
-        info.value = bossName
+        local text = '    '  .. data.color .. bossName .. '    '
+        local value = bossName
+        local info = UIDropDownMenu_CreateInfo()
+        info.checked = nil
+        info.text = text
+        info.value = value
+        info.func = function()
+            UIDropDownMenu_SetSelectedValue(self, value)
+            Table:BossDropDownChanged(value)
+        end
         UIDropDownMenu_AddButton(info)
     end
 
-
-	info.text = ALT_KEY;
-	info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
-	info.value = "ALT";
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	else
-		info.checked = nil;
-	end
-	info.tooltipTitle = ALT_KEY;
-	info.tooltipText = OPTION_TOOLTIP_PICKUP_ACTION_ALT_KEY;
-	UIDropDownMenu_AddButton(info);
-
-	info.text = CTRL_KEY;
-	info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
-	info.value = "CTRL";
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	else
-		info.checked = nil;
-	end
-	info.tooltipTitle = CTRL_KEY;
-	info.tooltipText = OPTION_TOOLTIP_PICKUP_ACTION_CTRL_KEY;
-	UIDropDownMenu_AddButton(info);
-
-	info.text = SHIFT_KEY;
-	info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
-	info.value = "SHIFT";
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	else
-		info.checked = nil;
-	end
-	info.tooltipTitle = SHIFT_KEY;
-	info.tooltipText = OPTION_TOOLTIP_PICKUP_ACTION_SHIFT_KEY;
-	UIDropDownMenu_AddButton(info);
-
-	info.text = NONE_KEY;
-	info.func = InterfaceOptionsActionBarsPanelPickupActionKeyDropDown_OnClick;
-	info.value = "NONE";
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	else
-		info.checked = nil;
-	end
-	info.tooltipTitle = NONE_KEY;
-	info.tooltipText = OPTION_TOOLTIP_PICKUP_ACTION_NONE_KEY;
-	UIDropDownMenu_AddButton(info);
 end
 
+function WBC_InitItemDropDown(self)
+    if not selectedBoss then 
+        self:Hide()
+        return
+    end
+
+
+    local info = UIDropDownMenu_CreateInfo()
+    local text = WBCoalition.CLASS_COLOR_NONE .. '- Any item -'
+    info.text = text
+    info.value = nil
+    info.notCheckable = true
+    info.func = function()
+        UIDropDownMenu_SetSelectedValue(self, nil)
+        UIDropDownMenu_SetText(self, text)
+        Table:ItemDropDownChanged(nil)
+    end
+    UIDropDownMenu_AddButton(info)
+    UIDropDownMenu_SetText(self, text)
+
+
+    local loot = WBCoalition.BOSS_DATA[selectedBoss].loot
+    for _,itemId in pairs(loot) do
+        local itemName, itemLink = GetItemInfo(itemId)
+        local info = UIDropDownMenu_CreateInfo()
+        info.notCheckable = true
+        info.checked = nil
+        info.text = itemLink
+        info.value = itemName
+        info.tooltipOnButton  = 1;
+        info.func = function()
+            UIDropDownMenu_SetSelectedValue(self, itemName)
+            UIDropDownMenu_SetText(self, itemLink)
+            Table:ItemDropDownChanged(itemId)
+        end
+        UIDropDownMenu_AddButton(info)
+    end
+
+    UIDropDownMenu_SetWidth(self, 180, 55)
+end
 
 function Table:Initialize()
     for i = 1, PAGE_SIZE do
@@ -275,20 +279,64 @@ function Table:Initialize()
     scrollView = WBCTableTabFrameTabContentFrameScrollFrame
 end
 
+function Table:BossDropDownChanged(value)
+    if selectedBoss == value then return end
+
+    selectedItem = nil
+    selectedBoss = value
+
+    local itemDropDown = WBCTableFrameItemDropDown
+
+    if not selectedBoss then
+        selectedItem = nil
+        itemDropDown:Hide()
+    else
+        UIDropDownMenu_Initialize(itemDropDown, WBC_InitItemDropDown)
+        itemDropDown:Show()
+    end
+    Table:Recalculate()
+end
+
+function Table:ItemDropDownChanged(value)
+    selectedItem = value
+    Table:Recalculate()
+end
+
 function Table:RaidOnlyToggled()
-    if WBCTableInRaidCheckbox:GetChecked() then
+    if WBCTableFrameInRaidCheckbox:GetChecked() then
         Table:UpdateRaidInfo()
-        WBCTableNotInRaidCheckbox:SetChecked(false)
+        WBCTableFrameNotInRaidCheckbox:SetChecked(false)
     end
     Table:Recalculate()
 end
 
 function Table:RaidOnlyNotToggled()
-    if WBCTableNotInRaidCheckbox:GetChecked() then
+    if WBCTableFrameNotInRaidCheckbox:GetChecked() then
         Table:UpdateRaidInfo()
-        WBCTableInRaidCheckbox:SetChecked(false)
+        WBCTableFrameInRaidCheckbox:SetChecked(false)
     end
     Table:Recalculate()
+end
+
+function Table:WantLootToggled()
+    if WBCTableFrameWantLootCheckbox:GetChecked() then
+        WBCTableFrameDontWantLootCheckbox:SetChecked(false)
+    end
+    Table:Recalculate()
+end
+
+function Table:DontWantLootToggled()
+    if WBCTableFrameDontWantLootCheckbox:GetChecked() then
+        WBCTableFrameWantLootCheckbox:SetChecked(false)
+    end
+    Table:Recalculate()
+end
+
+function Table:OnPlusInChat(name, msg)
+    local mainName = WBCDB.altMap[name]
+    if mainName then name = mainName end
+    plusInTheChat[name] = {msg = msg, sender = name}
+    WBCoalition.Table:Recalculate()
 end
 
 function Table:ClearPluses()
@@ -314,7 +362,7 @@ function Table:ReportPluses()
         return
     end
 
-    table.sort(candidateList, sorters['points'])
+    table.sort(candidateList, Table.Sorters['points'])
 
     SendChatMessage('Loot interest:', 'RAID')
     for i = 1, #candidateList do
@@ -352,7 +400,7 @@ function Table:Recalculate()
 
     playerList = table.keys(players)
 
-    if not WBCTableNotInRaidCheckbox:GetChecked() then
+    if not WBCTableFrameNotInRaidCheckbox:GetChecked() then
         for i = 1, #raid do
             local raiderName = raid[i]
             local mainName = altMap[raiderName]
@@ -360,7 +408,7 @@ function Table:Recalculate()
         end
     end
 
-    if WBCTableInRaidCheckbox:GetChecked() then
+    if WBCTableFrameInRaidCheckbox:GetChecked() then
         playerList = {}
         local alreadyCounted = {}
         for i = 1, #raid do
@@ -373,7 +421,7 @@ function Table:Recalculate()
                 table.insert(playerList, mainName)
             end
         end
-    elseif WBCTableNotInRaidCheckbox:GetChecked() then
+    elseif WBCTableFrameNotInRaidCheckbox:GetChecked() then
         local isInRaid = {}
         for i = 1, #raid do
             local raiderName = raid[i]
@@ -387,7 +435,28 @@ function Table:Recalculate()
         playerList = newPlayerList
     end
 
-    if WBCTableShowInterestedCheckbox:GetChecked() then
+    local selectedEntity = selectedItem or selectedBoss
+    if selectedEntity then
+        if WBCTableFrameWantLootCheckbox:GetChecked() then
+            local newPlayerList = {}
+            for _,playerName in pairs(playerList) do
+                if WBCDB.lootRanks[selectedEntity][playerName] then
+                    table.insert(newPlayerList, playerName)
+                end
+            end
+            playerList = newPlayerList
+        elseif WBCTableFrameDontWantLootCheckbox:GetChecked() then
+            local newPlayerList = {}
+            for _,playerName in pairs(playerList) do
+                if not WBCDB.lootRanks[selectedEntity][playerName] then
+                    table.insert(newPlayerList, playerName)
+                end
+            end
+            playerList = newPlayerList
+        end
+    end
+
+    if WBCTableFrameShowInterestedCheckbox:GetChecked() then
         local newPlayerList = {}
         for i = 1, #playerList do
             if plusInTheChat[playerList[i]] then table.insert(newPlayerList, playerList[i]) end
@@ -406,7 +475,7 @@ function Table:Recalculate()
         end
     end
 
-    table.sort(playerDisplayOrder, sorters[sortBy])
+    table.sort(playerDisplayOrder, Table.Sorters[sortBy])
     Table:Refresh()
 end
 
@@ -419,7 +488,15 @@ function Table:Refresh()
         rows[i].name:SetText(WBCoalition:GetClassColoredName(playerName))
 
         if playerName and players[playerName] then
-            rows[i].points:SetText(players[playerName].points)
+            local points = players[playerName].points
+            local selectedEntity = selectedItem or selectedBoss
+            if selectedEntity then
+                local rank = WBCDB.lootRanks[selectedEntity][playerName]
+                local color = WBCoalition.ITEM_RANK_COLORS[min(rank or 0,5)] or WBCoalition.CLASS_COLOR_NONE
+                rows[i].points:SetText(color .. points)
+            else
+                rows[i].points:SetText(points)
+            end
         else
             rows[i].points:SetText()
         end
@@ -448,6 +525,34 @@ function Table:Refresh()
 
         rows[i].line.playerName = playerName
     end
+end
+
+function Table:SetPlayerTooltip(node)
+    local mainName = node.playerName
+    if not mainName then return end
+    GameTooltip:ClearLines()
+    GameTooltip:AddLine(WBCoalition:GetClassColoredName(mainName))
+    
+    if not WBCDB.players[mainName] then
+        GameTooltip:AddLine('|cffff0000Not in the sheet')
+        GameTooltip:Show()
+        return
+    end
+
+    local lootInterest = WBCDB.players[mainName].lootInterest
+    if lootInterest and table.getn(lootInterest) > 0 then
+        local interestText = ''
+        local interestTitle = 'Interested in:'
+        for _,itemId in pairs(lootInterest) do
+            local _,itemLink = GetItemInfo(itemId)
+            interestText = interestText .. itemLink .. '\n'
+            interestTitle = interestTitle .. '\n'
+        end
+        GameTooltip:AddDoubleLine(interestTitle, interestText)
+    else
+        GameTooltip:AddLine('Not interested in any loot')
+    end
+    GameTooltip:Show()
 end
 
 function Table:SetSortColumn(buttonName)
@@ -483,9 +588,11 @@ function Table:ParseInput()
         local lines = splitString(decoded, '\n\r')
         local lastUpdate = math.floor(tonumber(splitString(lines[1], ',')[2]))
         for i = 2, #lines do
-            local line = splitString(lines[i], ',')
+            local line = {strsplit(',',lines[i])}
+
             local name = line[1]
             local playerPoints = math.floor(tonumber(line[2]) + 0.5)
+
             local altListRaw = splitString(line[3], ';')
             local altList = {}
             local altAdded = {}
@@ -500,7 +607,16 @@ function Table:ParseInput()
                 end
             end
 
-            players[name] = {alts = {}, points = playerPoints}
+            local lootInterestJoined = line[4]
+            local lootInterest = {}
+            if lootInterestJoined then
+                local lootInterestSplit = splitString(lootInterestJoined, ';')
+                for _,itemIdStr in pairs(lootInterestSplit) do
+                    table.insert(lootInterest, tonumber(itemIdStr))
+                end
+            end
+
+            players[name] = {alts = {}, points = playerPoints, lootInterest = lootInterest}
 
             altMap[name] = name
             for j = 1, #altList do
@@ -511,15 +627,15 @@ function Table:ParseInput()
             table.insert(players[name].alts, 1, name)
         end
 
-        playerDisplayOrder = table.clone(players)
-        WBCLoadEditBox:SetText('')
-        WBCoalition:Log("Data loaded :)")
-
         WBCDB.players = players
         WBCDB.lastUpdate = {time = lastUpdate, source = '<Sheet>'}
         WBCDB.altMap = altMap
+        WBCoalition.LootDistributor:RecalculateLootRanks()
         WBCoalition.Table:Recalculate()
         WBCoalition.Sync:OnNewDataLoaded()
+
+        WBCLoadEditBox:SetText('')
+        WBCoalition:Log("Data loaded :)")
     end
 end
 

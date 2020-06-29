@@ -3,13 +3,17 @@ WBCoalition = {}
 SLASH_WBC1 = "/wbc"
 
 WBCIcon = {}
-WBCDB = {players = {}, altMap = {}, lastUpdate = {}}
+WBCDB = {players = {}, altMap = {}, lootRanks = {}, lastUpdate = {}}
 WBCCache = {classes = {}, tracks = {}, loogLot = {}}
 WBCTemp = {normalizedStrings = {}}
 
 WBCoalition.CLASS_COLOR_NONE = '|cffc2b5b5'
 
+WBCoalition.ITEM_RANK_COLORS = {'|cff22ff22', '|cff80ff00', '|cffffff00', '|cffff8000', '|cffff0000'}
+
 local greenDragonColor = '|cff99ff99'
+
+local sharedGreenDragonLoot = {20579, 20615, 20616, 20618, 20617, 20619, 20582, 20644, 20580, 20581}
 
 WBCoalition.BOSS_DATA = {
     ['Lord Kazzak'] = {
@@ -20,9 +24,30 @@ WBCoalition.BOSS_DATA = {
         loot = {19132, 18208, 18541, 18547, 18545, 19131, 19130, 17070, 18202, 18542, 18704},
         color = '|cff58d0e8'
     },
+    ['Emeriss'] = {
+        loot = {
+            20623, 20622, 20624, 20621, 20599,
+            20579, 20615, 20616, 20618, 20617, 20619, 20582, 20644, 20580, 20581
+        },
+        color = greenDragonColor
+    },
     ['Lethon'] = {
         loot = {
             20628, 20626, 20630, 20625, 20627, 20629,
+            20579, 20615, 20616, 20618, 20617, 20619, 20582, 20644, 20580, 20581
+        },
+        color = greenDragonColor
+    },
+    ['Taerar'] = {
+        loot = {
+            20633, 20631, 20634, 20632, 20577,
+            20579, 20615, 20616, 20618, 20617, 20619, 20582, 20644, 20580, 20581
+        },
+        color = greenDragonColor
+    },
+    ['Ysondre'] = {
+        loot = {
+            20637, 20635, 20638, 20639, 20636, 20578,
             20579, 20615, 20616, 20618, 20617, 20619, 20582, 20644, 20580, 20581
         },
         color = greenDragonColor
@@ -93,7 +118,7 @@ local function createPlayerDropdown(node)
     info.text = 'Clear data'
     info.notCheckable = true
     info.func = function()
-        WBCDB = {players = {}, altMap = {}, lastUpdate = {}}
+        WBCDB = {players = {}, altMap = {}, lootRanks = {}, lastUpdate = {}}
         -- WBCCache = {classes = {}}
         WBCTemp = {normalizedStrings = {}}
         WBCoalition.Table:Recalculate()
@@ -169,6 +194,10 @@ function WBCoalition:NormalizeString(input)
     return normalizedString
 end
 
+function WBCoalition:ConcatTables(t1,t2)
+    return concatTables(t1,t2)
+end
+
 function WBCoalition:GetClassColoredName(name)
     if name == nil then return nil end
 
@@ -194,12 +223,12 @@ function WBCoalition:LogError(msg) WBCoalition:Log('|cffff0000' .. msg) end
 function SlashCmdList.WBC(cmd) WBCoalition.LootDistributor:OnCommand(cmd) end
 
 local function processEvent(event, type, ...)
-    print('EVENT')
     if type == 'VARIABLES_LOADED' then
         WBCDB = WBCDB or {}
         WBCDB.players = WBCDB.players or {}
         WBCDB.lastUpdate = WBCDB.lastUpdate or {time = nil, source = nil}
         WBCDB.altMap = WBCDB.altMap or {}
+        WBCDB.lootRanks = WBCDB.lootRanks or {}
 
         WBCCache = WBCCache or {}
         WBCCache.classes = WBCCache.classes or {}
@@ -214,13 +243,9 @@ local function processEvent(event, type, ...)
     elseif type == 'CHAT_MSG_RAID' or type == 'CHAT_MSG_RAID_LEADER' or type == 'CHAT_MSG_PARTY' or type ==
         'CHAT_MSG_PARTY_LEADER' or type == 'CHAT_MSG_WHISPER' then
         local msg, sender = ...
-        local name = splitString(sender, '-')[1]
+        local name = strsplit('-', sender)
         if string.sub(msg, 1, 1) == '+' then
-            local senderName = splitString(sender, '-')[1]
-            local mainName = altMap[name]
-            if mainName then name = mainName end
-            plusInTheChat[name] = {msg = msg, sender = senderName}
-            WBCoalition.Table:Recalculate()
+            WBCoalition.Table:OnPlusInChat(name, msg)
         end
         if type == 'CHAT_MSG_WHISPER' then WBCoalition.InviteHelper:OnWhisper(name, msg) end
     elseif type == 'GROUP_ROSTER_UPDATE' then
