@@ -124,6 +124,7 @@ StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
         local currentIndex = zoneIndex
         local zone = ZONES[zoneIndex]
         C_FriendList.SetWhoToUi(true)
+        FriendsFrame:UnregisterEvent("WHO_LIST_UPDATE")
         C_FriendList.SendWho(zone)
         try = try + 1
         WBC:Log('Scanning ' .. zone .. '...')
@@ -147,9 +148,7 @@ StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
 
 function Scanner:OnWhoResult()
     if not isScanning then return end
-    if not UnitAffectingCombat("player") then
-        HideUIPanel(FriendsFrame)
-    end
+    FriendsFrame:RegisterEvent("WHO_LIST_UPDATE")
     saveWhoResults()
     local zone = ZONES[zoneIndex]
     try = 0
