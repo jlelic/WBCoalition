@@ -125,6 +125,9 @@ StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
         local currentIndex = zoneIndex
         local zone = ZONES[zoneIndex]
         C_FriendList.SendWho(zone)
+        if not UnitAffectingCombat("player") then
+            HideUIPanel(FriendsFrame)
+        end
         try = try + 1
         WBC:Log('Scanning ' .. zone .. '...')
         C_Timer.After(3, function()
