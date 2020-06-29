@@ -1,7 +1,7 @@
 WBCoalition.ScoutScanner = {}
 local Scanner = WBCoalition.ScoutScanner
 
-local ENEMIES = {{'Praxis', 'Legacy', 'A Bards Tale'}}
+local competitors = {{'Praxis', 'Legacy', 'A Bards Tale'}}
 
 local WBC
 
@@ -25,9 +25,9 @@ end
 
 local function isEnemyCoalition(name,guild)
     if name == 'Kimeera' then return 1 end
-    for i=1,#ENEMIES do
-        for j=1,#ENEMIES[i] do
-            if ENEMIES[i][j] == guild then
+    for i=1,#competitors do
+        for j=1,#competitors[i] do
+            if competitors[i][j] == guild then
                 return i
             end
         end
@@ -72,7 +72,7 @@ end
 local function saveWhoResults()
     local x, total = C_FriendList.GetNumWhoResults()
     local zoneInfo = {name = ZONES[zoneIndex], scouts={}, enemies={}, total = total}
-    for i=1,#ENEMIES do
+    for i=1,#competitors do
         table.insert(zoneInfo.enemies, {})
     end
     for i=1,total do
