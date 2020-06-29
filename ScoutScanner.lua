@@ -59,17 +59,18 @@ local function reportResults()
             reportPlayerInfo(j, scout)
         end
         if #zoneInfo.scouts == 0 then
-            WBC:Log('   |cffff0000We are missing scouts in ' .. zoneInfo.name .. '!!')
+            WBC:Log('   |cffff0000We are missing scouts in ' .. zoneInfo.name .. '!')
         end
         for c=1,#competitors do
             local competitorLeader = competitors[c][1]
-            WBC:Log('   ' .. competitorLeader ..' Coalition:')
-            for j=1,#zoneInfo.enemies[c] do
-                local scout = zoneInfo.enemies[c][j]
-                reportPlayerInfo(j, scout)
-            end
-            if #zoneInfo.enemies[c] == 0 then
-                WBC:Log('   |cffff0000' .. competitorLeader .. ' is missing scouts in ' .. zoneInfo.name .. '!!')
+            if #zoneInfo.enemies[c] > 0 then
+                WBC:Log('   ' .. competitorLeader ..':')
+                for j=1,#zoneInfo.enemies[c] do
+                    local scout = zoneInfo.enemies[c][j]
+                    reportPlayerInfo(j, scout)
+                end
+            else
+                WBC:Log('   |cffff0000' .. competitorLeader .. ' is missing scouts in ' .. zoneInfo.name .. '!')
             end
         end
     end
