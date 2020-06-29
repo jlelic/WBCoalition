@@ -103,13 +103,16 @@ end
 
 local function scanNextZone()
     StaticPopup_Hide(DIALOG_CONTINUE_SCANNING)
+
+    if zoneIndex > #ZONES then return end
+
     local zone = ZONES[zoneIndex]
     local msg = ''
     if try > 1 then
         msg = 'Scan failed\n'
     end
     msg = msg .. 'Scanning ' .. zone
-    msg = msg .. '\n' .. zoneIndex .. '/' .. #ZONES 
+    msg = msg .. '\n' .. zoneIndex .. '/' .. #ZONES
 
     StaticPopup_Show(DIALOG_CONTINUE_SCANNING, msg)
 end
