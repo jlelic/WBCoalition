@@ -111,7 +111,7 @@ local function scanNextZone()
     if zoneIndex > #ZONES then return end
 
     local zone = ZONES[zoneIndex]
-    local msg = 'Scanning ' .. zone
+    local msg = zone
     if try > 1 then
         msg = msg .. ' (attempt ' .. try .. ')'
     end
@@ -122,7 +122,7 @@ end
 
 StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
     text = '%s',
-    button1 = 'Continue scanning',
+    button1 = 'Run scan',
     button2 = 'Stop',
     OnAccept = function(self, data)
         local zone = ZONES[zoneIndex]
@@ -167,7 +167,6 @@ end
 
 function Scanner:Scan()
     WBC = WBCoalition
-    WBC:Log('Scan initiated')
     results = {}
     isScanning = true
     zoneIndex = 1
