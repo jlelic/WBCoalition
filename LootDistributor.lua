@@ -144,7 +144,7 @@ function LootDistributor:OnCommand(cmd)
             local lootMethod = lootMethodMap[cmdMethod]
             if lootMethod then
                 if IsInRaid() and (UnitIsRaidOfficer('player') or UnitIsGroupLeader('player')) then
-                    Table:ClearPluses()
+                    WBCoalition.Table:ClearPluses()
                     local msg = ' /roll'
                     if lootMethod == LOOT_METHOD_BUY then
                         msg = ' + in the raid chat or whisper if you want to buy with points'
