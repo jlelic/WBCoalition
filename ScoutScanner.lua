@@ -47,18 +47,21 @@ local function reportPlayerInfo(index, playerInfo)
 end
 
 local function reportResults()
-    WBCoalition:Log('-- RESULTS --')
+    WBCoalition:Log('Scout Scan Results: ')
     for i=1,#results do
         local zoneInfo = results[i]
         WBCoalition:Log('|cffffffcc' .. zoneInfo.name)
-        WBCoalition:Log('   Coalition:')
-        for j=1,#zoneInfo.scouts do
-            local scout = zoneInfo.scouts[j]
-            reportPlayerInfo(j, scout)
-        end
-        if #zoneInfo.scouts == 0 then
+
+        if #zoneInfo.scouts > 0 then
+            WBCoalition:Log('   Coalition:')
+            for j=1,#zoneInfo.scouts do
+                local scout = zoneInfo.scouts[j]
+                reportPlayerInfo(j, scout)
+            end
+        else
             WBCoalition:Log('   |cffff0000We are missing scouts in ' .. zoneInfo.name .. '!')
         end
+
         for c=1,#competitors do
             local competitorLeader = competitors[c][1]
             if #zoneInfo.competitors[c] > 0 then
