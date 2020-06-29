@@ -148,6 +148,7 @@ function Scanner:OnWhoResult()
     gotResultsFor = zoneIndex
     zoneIndex = zoneIndex + 1
     if zoneIndex > #ZONES then
+        isScanning = false
         WBC:Log('Scan completed')
         reportResults()
     end
