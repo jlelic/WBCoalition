@@ -1,7 +1,10 @@
 WBCoalition.ScoutScanner = {}
 local Scanner = WBCoalition.ScoutScanner
 
-local competitors = {{'Praxis', 'Legacy', 'A Bards Tale'}}
+local competitors = {
+    {'Praxis', 'Undying Legacy', 'A Bards Tale', 'Neighbourhood'},
+    {'Redrum Inc', 'RR Inc', 'Solid', 'CORE', 'Ember', 'Close to Insanity', 'Scarlet Crusade'}
+}
 
 local WBC
 
