@@ -120,7 +120,7 @@ end
 StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
     text = '%s',
     button1 = 'Continue scanning',
-    button2 = 'Cancel',
+    button2 = 'Stop',
     OnAccept = function(self, data)
         local currentIndex = zoneIndex
         local zone = ZONES[zoneIndex]
@@ -136,7 +136,12 @@ StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
             end
         end)
     end,
-    OnCancel = function() isScanning = false end,
+    OnCancel = function()
+        isScanning = false
+        if zoneIndex > 1 then
+            reportResults()
+        end
+    end,
     timeout = 0,
     whileDead = true,
     hideOnEscape = true,
