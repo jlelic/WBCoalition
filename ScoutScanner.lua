@@ -62,7 +62,7 @@ local function reportResults()
             WBC:Log('   |cffff0000We are missing scouts in ' .. zoneInfo.name .. '!!')
         end
         for c=1,#competitors do
-            local competitorLeader = competitors[c][0]
+            local competitorLeader = competitors[c][1]
             WBC:Log('   ' .. competitorLeader ..' Coalition:')
             for j=1,#zoneInfo.enemies[c] do
                 local scout = zoneInfo.enemies[c][j]
