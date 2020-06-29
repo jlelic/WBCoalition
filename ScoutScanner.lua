@@ -123,6 +123,7 @@ StaticPopupDialogs[DIALOG_CONTINUE_SCANNING] = {
     OnAccept = function(self, data)
         local currentIndex = zoneIndex
         local zone = ZONES[zoneIndex]
+        C_FriendList.SetWhoToUi(true)
         C_FriendList.SendWho(zone)
         try = try + 1
         WBC:Log('Scanning ' .. zone .. '...')
