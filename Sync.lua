@@ -44,7 +44,7 @@ local function sendData(channel, target, fsyncState)
 
     local data = ''
     for name, info in pairs(WBCDB.players) do
-        local newLine = ';' .. info.points .. '^' .. table.concat(info.alts, ',')
+        local newLine = ';' .. info.points .. '^' .. table.concat(info.alts, ',') .. '^'  .. table.concat(info.lootInterest, ',')
         data = data .. newLine
     end
 
@@ -144,10 +144,19 @@ local function onDataReceived(prefix, compressedMsg, channel, sender)
     local newAltMap = {}
     for i = 2, #lines do
         if strlen(lines[i]) > 0 then
-            local points, altListJoined = strsplit('^', lines[i])
+            local points, altListJoined, lootInterestJoined = strsplit('^', lines[i])
+
             local altList = {strsplit(',', altListJoined)}
             local name = altList[1]
-            newPlayers[name] = {alts = altList, points = tonumber(points)}
+            
+            local lootInterestStr = {strsplit(',', lootInterestJoined)}
+            local lootInterest = {}
+            for _,itemIdStr in ipairs(lootInterestStr) do
+                table.insert(lootInterest, tonumber(itemIdStr))
+            end
+
+
+            newPlayers[name] = {alts = altList, points = tonumber(points), lootInterest = lootInterest}
             for j = 1, #altList do newAltMap[altList[j]] = name end
         end
     end
@@ -156,6 +165,7 @@ local function onDataReceived(prefix, compressedMsg, channel, sender)
     WBCDB.altMap = newAltMap
     WBCDB.lastUpdate.time = lastUpdate
     WBCDB.lastUpdate.source = sender
+    WBCoalition.LootDistributor:RecalculateLootRanks()
     WBCoalition.Table:Recalculate()
 
     if fsyncState == FORCE_SYNC_STATE.offer then

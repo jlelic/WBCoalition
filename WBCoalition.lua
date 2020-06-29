@@ -4,7 +4,7 @@ SLASH_WBC1 = "/wbc"
 
 WBCIcon = {}
 WBCDB = {players = {}, altMap = {}, lootRanks = {}, lastUpdate = {}}
-WBCCache = {classes = {}, tracks = {}, loogLot = {}}
+WBCCache = {classes = {}, tracks = {}, lootLog = {}}
 WBCTemp = {normalizedStrings = {}}
 
 WBCoalition.CLASS_COLOR_NONE = '|cffc2b5b5'
