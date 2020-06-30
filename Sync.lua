@@ -149,12 +149,13 @@ local function onDataReceived(prefix, compressedMsg, channel, sender)
             local altList = {strsplit(',', altListJoined)}
             local name = altList[1]
             
-            local lootInterestStr = {strsplit(',', lootInterestJoined)}
             local lootInterest = {}
-            for _,itemIdStr in ipairs(lootInterestStr) do
-                table.insert(lootInterest, tonumber(itemIdStr))
+            if lootInterestJoined then
+                local lootInterestStr = {strsplit(',', lootInterestJoined)}
+                for _,itemIdStr in ipairs(lootInterestStr) do
+                    table.insert(lootInterest, tonumber(itemIdStr))
+                end
             end
-
 
             newPlayers[name] = {alts = altList, points = tonumber(points), lootInterest = lootInterest}
             for j = 1, #altList do newAltMap[altList[j]] = name end
