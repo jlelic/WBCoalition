@@ -563,7 +563,7 @@ function Table:SetPlayerTooltip(node)
             local lootRank = WBCDB.lootRanks[itemId][mainName]
             local raidLootRank = raidLootRanks[itemId] and raidLootRanks[itemId][mainName] or 0
             local leftLine =  getLootRankColor(lootRank) .. lootRank .. '|cffffffff. '
-            if raidLootRank then
+            if raidLootRank and raidLootRank > 0 then
                 leftLine =  leftLine .. '(' ..  getLootRankColor(raidLootRank) .. raidLootRank .. '|cffffffff) '
             end
             leftLine = leftLine .. itemLink
