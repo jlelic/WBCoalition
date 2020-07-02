@@ -28,6 +28,7 @@ local rows = {}
 
 local raid = {}
 local raidMap = {}
+local raidLootRanks = {}
 
 local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/' -- You will need this for encoding/decoding
 
@@ -170,6 +171,10 @@ local function filterPlayer(player, filter)
     return true
 end
 
+local function getLootRankColor(rank)
+    return WBCoalition.ITEM_RANK_COLORS[min(rank or 0,5)] or WBCoalition.CLASS_COLOR_NONE
+end
+
 Table.Sorters = {
     ["name"] = function(a, b) return WBCoalition:NormalizeString(a) < WBCoalition:NormalizeString(b) end,
     ["points"] = function(a, b)
@@ -203,7 +208,8 @@ function WBC_InitBossDropDown(self)
    
     UIDropDownMenu_SetText(self, text)
 
-    for bossName, data in pairs(WBCoalition.BOSS_DATA) do
+    for _, bossName in ipairs(WBCoalition.BOSS_NAMES) do
+        local data = WBCoalition.BOSS_DATA[bossName]
         local text = '    '  .. data.color .. bossName .. '    '
         local value = bossName
         local info = UIDropDownMenu_CreateInfo()
@@ -241,7 +247,7 @@ function WBC_InitItemDropDown(self)
 
 
     local loot = WBCoalition.BOSS_DATA[selectedBoss].loot
-    for _,itemId in pairs(loot) do
+    for _,itemId in ipairs(loot) do
         local itemName, itemLink = GetItemInfo(itemId)
         local info = UIDropDownMenu_CreateInfo()
         info.notCheckable = true
@@ -484,15 +490,21 @@ function Table:Refresh()
     local offset = FauxScrollFrame_GetOffset(scrollView)
     local serverTime = GetServerTime()
     for i = 1, PAGE_SIZE do
+        -- Name
         local playerName = playerDisplayOrder[offset + i]
         rows[i].name:SetText(WBCoalition:GetClassColoredName(playerName))
 
+        -- Points
         if playerName and players[playerName] then
             local points = players[playerName].points
             local selectedEntity = selectedItem or selectedBoss
             if selectedEntity then
-                local rank = WBCDB.lootRanks[selectedEntity][playerName]
-                local color = WBCoalition.ITEM_RANK_COLORS[min(rank or 0,5)] or WBCoalition.CLASS_COLOR_NONE
+                local lootRanks = WBCDB.lootRanks
+                if WBCTableFrameInRaidCheckbox:GetChecked() then
+                    lootRanks = raidLootRanks
+                end
+                local rank = lootRanks[selectedEntity][playerName]
+                local color = getLootRankColor(rank)
                 rows[i].points:SetText(color .. points)
             else
                 rows[i].points:SetText(points)
@@ -501,6 +513,7 @@ function Table:Refresh()
             rows[i].points:SetText()
         end
 
+        -- In raid as
         if raidMap[playerName] == nil then
             rows[i].inRaidAs:SetText()
         else
@@ -508,6 +521,7 @@ function Table:Refresh()
                                                   WBCoalition.CLASS_COLOR_NONE .. ', '))
         end
 
+        -- Alts
         if not playerName or not players[playerName] or not players[playerName].alts then
             rows[i].alts:SetText()
         else
@@ -517,6 +531,7 @@ function Table:Refresh()
             rows[i].alts:SetText(table.concat(table.map(justAlts, getClassColoredName), WBCoalition.CLASS_COLOR_NONE .. ', '))
         end
 
+        -- + Highlight
         if not playerName or not plusInTheChat[playerName] then
             rows[i].line:GetNormalTexture():SetColorTexture(0, 0, 0, 0)
         else
@@ -531,6 +546,7 @@ function Table:SetPlayerTooltip(node)
     local mainName = node.playerName
     if not mainName then return end
     GameTooltip:ClearLines()
+    GameTooltip:SetBackdropColor(0,0,0,1)
     GameTooltip:AddLine(WBCoalition:GetClassColoredName(mainName))
     
     if not WBCDB.players[mainName] then
@@ -541,14 +557,21 @@ function Table:SetPlayerTooltip(node)
 
     local lootInterest = WBCDB.players[mainName].lootInterest
     if lootInterest and table.getn(lootInterest) > 0 then
-        local interestText = ''
-        local interestTitle = 'Interested in:'
+        GameTooltip:AddLine('Interested in:')
         for _,itemId in pairs(lootInterest) do
             local _,itemLink = GetItemInfo(itemId)
-            interestText = interestText .. itemLink .. '\n'
-            interestTitle = interestTitle .. '\n'
+            local lootRank = WBCDB.lootRanks[itemId][mainName]
+            local raidLootRank = raidLootRanks[itemId][mainName]
+            local leftLine =  getLootRankColor(lootRank) .. lootRank .. '|cffffffff. '
+            if raidLootRank then
+                leftLine =  leftLine .. '(' ..  getLootRankColor(raidLootRank) .. raidLootRank .. '|cffffffff) '
+            end
+            leftLine = leftLine .. itemLink
+            GameTooltip:AddDoubleLine(
+                leftLine,
+                WBCoalition.LootDistributor:GetLootSource(itemId)
+            )
         end
-        GameTooltip:AddDoubleLine(interestTitle, interestText)
     else
         GameTooltip:AddLine('Not interested in any loot')
     end
@@ -660,4 +683,5 @@ function Table:UpdateRaidInfo()
             WBCoalition:NormalizeString(raiderName)
         end
     end
+    WBCoalition.LootDistributor:RecalculateRaidLootRanks(raidMap, raidLootRanks)
 end

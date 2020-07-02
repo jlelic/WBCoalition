@@ -9,11 +9,9 @@ WBCTemp = {normalizedStrings = {}}
 
 WBCoalition.CLASS_COLOR_NONE = '|cffc2b5b5'
 
-WBCoalition.ITEM_RANK_COLORS = {'|cff22ff22', '|cff80ff00', '|cffffff00', '|cffff8000', '|cffff0000'}
+WBCoalition.ITEM_RANK_COLORS = {'|cff00ad3a', '|cffaaff00', '|cffffff00', '|cffff8000', '|cffff0000'}
 
 local greenDragonColor = '|cff99ff99'
-
-local sharedGreenDragonLoot = {20579, 20615, 20616, 20618, 20617, 20619, 20582, 20644, 20580, 20581}
 
 WBCoalition.BOSS_DATA = {
     ['Lord Kazzak'] = {
@@ -54,10 +52,7 @@ WBCoalition.BOSS_DATA = {
     }
 }
 
-WBCoalition.BOSS_NAMES = {}
-for bossName,_ in pairs(WBCoalition.BOSS_DATA) do
-    table.insert(WBCoalition.BOSS_NAMES, bossName)
-end
+WBCoalition.BOSS_NAMES = {'Azuregos', 'Lord Kazzak', 'Emeriss', 'Lethon', 'Taerar', 'Ysondre'}
 
 local tableAccents = {}
 tableAccents["å"] = "a"
@@ -264,7 +259,6 @@ local function processEvent(event, type, ...)
 end
 
 function WBCoalition:Start()
-    print('start')
     WBCEventFrame:RegisterEvent('VARIABLES_LOADED')
     WBCEventFrame:RegisterEvent('CHAT_MSG_RAID')
     WBCEventFrame:RegisterEvent('CHAT_MSG_RAID_LEADER')

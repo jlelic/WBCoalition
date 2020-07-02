@@ -274,7 +274,7 @@
                     </OnLoad>
                     <OnEnter>
                         if ( not self.isDisabled ) then
-                            GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
+                            GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
                             GameTooltip:SetText("Use different color for player's interested in loot from a boss", nil, nil, nil, nil, true);
                         end
                     </OnEnter>
@@ -293,7 +293,7 @@
                     </OnLoad>
                     <OnEnter>
                         if ( not self.isDisabled ) then
-                            GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
+                            GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
                             GameTooltip:SetText("Use different color for player's interested in an item", nil, nil, nil, nil, true);
                         end
                     </OnEnter>
@@ -754,7 +754,7 @@
                 </FontString>
                 <TextInsets left="6" right="6" top="6" bottom="6" />
             </EditBox>
-            <CheckButton name="$parentWantLootCheckbox" inherits="OptionsCheckButtonTemplate">
+            <CheckButton name="$parentWantLootCheckbox" inherits="OptionsCheckButtonTemplate" disabled="true">
                 <Size>
                     <AbsDimension x="24" y="24" />
                 </Size>
@@ -772,7 +772,7 @@
                     </OnClick>
                 </Scripts>
             </CheckButton>
-            <CheckButton name="$parentDontWantLootCheckbox" inherits="OptionsCheckButtonTemplate">
+            <CheckButton name="$parentDontWantLootCheckbox" inherits="OptionsCheckButtonTemplate" disabled="true">
                 <Size>
                     <AbsDimension x="24" y="24" />
                 </Size>

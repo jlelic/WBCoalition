@@ -37,11 +37,31 @@ local lootMethodMap = {
 
 local DIALOG_CONFIRM_CLEAR = "WBC_DIALOG_CONFIRM_CLEAR_LOOT_LOG"
 
+local isSharedGreenDragonLoot = {
+    [20579] = true,
+    [20615] = true,
+    [20616] = true,
+    [20618] = true,
+    [20617] = true,
+    [20619] = true,
+    [20582] = true,
+    [20644] = true,
+    [20580] = true,
+    [20581] = true
+}
+
 local allItemIds = {}
+local dropsFrom = {}
 
 for boss,data in pairs(WBCoalition.BOSS_DATA) do
     for _, itemId in ipairs(data.loot) do
         table.insert(allItemIds, itemId)
+
+        if isSharedGreenDragonLoot[itemId] then
+            dropsFrom[itemId] = data.color .. '4 Dragons'
+        else
+            dropsFrom[itemId] = data.color .. boss
+        end
     end
 end
 
@@ -57,17 +77,6 @@ local function showUsage()
     WBCoalition:Log('/wbc |cffa334ee[Item Link]|r roll')
 end
 
-local function concatTables(t1, t2)
-    local result = {}
-    for i=1, (#t1 + #t2) do
-        if i <= n1 then
-            table.insert(result, t1[i])
-        else
-            table.insert(result, t2[i - #t1])
-        end
-    end
-    return result
-end
 
 local function getInterestedNames(itemId)
     local result = {}
@@ -95,6 +104,19 @@ local function isWBossLoot(itemName)
     return WBCCache.isWBossLoot[itemName]
 end
 
+local function recalculateBossLootRanks(lootRanks)
+    for boss,data in pairs(WBCoalition.BOSS_DATA) do
+        lootRanks[boss] = {}
+        for _,itemId in ipairs(data.loot) do
+            for player,_ in pairs(WBCDB.players) do
+                if lootRanks[itemId][player] then
+                    lootRanks[boss][player] = min(lootRanks[boss][player] or 99999, lootRanks[itemId][player])
+                end
+            end
+        end
+    end
+end
+
 function LootDistributor:ClearLog() StaticPopup_Show(DIALOG_CONFIRM_CLEAR) end
 
 function LootDistributor:SetLootLogText()
@@ -109,6 +131,10 @@ function LootDistributor:SetLootLogText()
     WBCLootLogEditBox:SetText(table.concat(texts, '\n'))
 end
 
+function LootDistributor:GetLootSource(itemId)
+    return dropsFrom[itemId]
+end
+
 function LootDistributor:RecalculateLootRanks()
     local lootRanks = {}
 
@@ -121,18 +147,35 @@ function LootDistributor:RecalculateLootRanks()
         end
     end
 
-    for boss,data in pairs(WBCoalition.BOSS_DATA) do
-        lootRanks[boss] = {}
-        for _,itemId in ipairs(data.loot) do
-            for player,_ in pairs(WBCDB.players) do
-                if lootRanks[itemId][player] then
-                    lootRanks[boss][player] = min(lootRanks[boss][player] or 99999, lootRanks[itemId][player])
-                end
+    recalculateBossLootRanks(lootRanks)
+
+    WBCDB.lootRanks = lootRanks
+end
+
+function LootDistributor:RecalculateRaidLootRanks(raidMap, raidLootRanks)
+    local lootRanks = WBCDB.lootRanks
+
+    for _,itemId in ipairs(allItemIds) do
+        raidLootRanks[itemId] = {}
+
+        local ordered = {}
+        local n = 0
+        for player,rank in pairs(lootRanks[itemId]) do
+            ordered[rank] = player
+            n = n +1
+        end
+        ordered.n = n
+
+        local raidRank = 1
+        for index,player in ipairs(ordered) do
+            if raidMap[player] then 
+                raidLootRanks[itemId][player] = raidRank 
+                raidRank = raidRank + 1
             end
         end
     end
 
-    WBCDB.lootRanks = lootRanks
+    recalculateBossLootRanks(raidLootRanks)
 end
 
 function LootDistributor:OnCommand(cmd)
