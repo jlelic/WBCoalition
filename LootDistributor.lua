@@ -160,7 +160,7 @@ function LootDistributor:RecalculateRaidLootRanks(raidMap, raidLootRanks)
 
         local ordered = {}
         local n = 0
-        for player,rank in pairs(lootRanks[itemId]) do
+        for player,rank in pairs(lootRanks[itemId] or {}) do
             ordered[rank] = player
             n = n +1
         end

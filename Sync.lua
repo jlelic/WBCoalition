@@ -167,6 +167,7 @@ local function onDataReceived(prefix, compressedMsg, channel, sender)
     WBCDB.lastUpdate.source = sender
     WBCoalition.LootDistributor:RecalculateLootRanks()
     WBCoalition.Table:Recalculate()
+    WBCoalition.Table:UpdateRaidInfo()
 
     if fsyncState == FORCE_SYNC_STATE.offer then
         WBCoalition:Log(FORCE_SYNC_COLOR_OK .. 'Received update from ' .. senderDetailed)
