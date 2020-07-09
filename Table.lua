@@ -388,8 +388,13 @@ function Table:ReportPluses()
     end
 end
 
+local skipRecalculateOnLoad = true
 function Table:Filter()
-    Table:Recalculate()
+    if skipRecalculateOnLoad then
+        skipRecalculateOnLoad = false
+    else
+        Table:Recalculate()
+    end
 end
 
 function Table:Recalculate()
