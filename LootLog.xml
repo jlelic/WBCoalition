@@ -12,7 +12,7 @@
                 WBCLootLog:StopMovingOrSizing()
             </OnMouseUp>
         </Scripts>
-        <Size x="480" y="480" />
+        <Size x="600" y="480" />
         <Anchors>
             <Anchor point="CENTER" />
         </Anchors>
@@ -142,7 +142,7 @@
                         <ScrollChild>
                             <EditBox name="WBCLootLogEditBox" letters="99999" multiLine="true" autoFocus="true" enableMouse="true">
                                 <Size>
-                                    <AbsDimension x="340" y="320" />
+                                    <AbsDimension x="500" y="320" />
                                 </Size>
                                 <FontString inherits="ChatFontNormal" />
                                 <Scripts>

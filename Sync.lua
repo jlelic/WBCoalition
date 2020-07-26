@@ -219,7 +219,7 @@ function Sync:SyncWith(mainName)
     else
         sendOffer('WHISPER', mainName, FORCE_SYNC_STATE.offer)
     end
-    C_Timer.After(6, function()
+    C_Timer.After(8, function()
         if forceSyncStates[mainName] then
             WBCoalition:LogError('Attempt to sync with ' .. mainName .. ' failed')
             forceSyncStates[mainName] = nil

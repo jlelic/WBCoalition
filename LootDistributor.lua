@@ -1,20 +1,18 @@
 WBCoalition.LootDistributor = {}
 local LootDistributor = WBCoalition.LootDistributor
 
-
-
 local function uniq(t)
     local result = {}
     local hash = {}
 
-    for _,v in pairs(t) do
+    for _, v in pairs(t) do
         if (not hash[v]) then
             table.insert(result, v)
             hash[v] = true
         end
-     end
+    end
 
-     return result
+    return result
 end
 
 local LOOT_METHOD_BUY = 'buy'
@@ -52,8 +50,9 @@ local isSharedGreenDragonLoot = {
 
 local allItemIds = {}
 local dropsFrom = {}
+local isRoll = false
 
-for boss,data in pairs(WBCoalition.BOSS_DATA) do
+for boss, data in pairs(WBCoalition.BOSS_DATA) do
     for _, itemId in ipairs(data.loot) do
         table.insert(allItemIds, itemId)
 
@@ -77,15 +76,12 @@ local function showUsage()
     WBCoalition:Log('/wbc |cffa334ee[Item Link]|r roll')
 end
 
-
 local function getInterestedNames(itemId)
     local result = {}
 
-    for name,data in pairs(WBCDB.players) do
-        for _,intestedIn in ipairs(data.lootInterest) do
-            if itemId == intestedIn then
-                table.insert(result, name)
-            end
+    for name, data in pairs(WBCDB.players) do
+        for _, intestedIn in ipairs(data.lootInterest) do
+            if itemId == intestedIn then table.insert(result, name) end
         end
     end
 
@@ -93,22 +89,22 @@ local function getInterestedNames(itemId)
 end
 
 local function isWBossLoot(itemName)
-    if not WBCCache.isWBossLoot then 
+    if not WBCCache.isWBossLoot then
         WBCCache.isWBossLoot = {}
         for _, itemId in ipairs(allItemIds) do
             local itemName = GetItemInfo(itemId)
             WBCCache.isWBossLoot[itemName] = true
-        end    
+        end
     end
 
     return WBCCache.isWBossLoot[itemName]
 end
 
 local function recalculateBossLootRanks(lootRanks)
-    for boss,data in pairs(WBCoalition.BOSS_DATA) do
+    for boss, data in pairs(WBCoalition.BOSS_DATA) do
         lootRanks[boss] = {}
-        for _,itemId in ipairs(data.loot) do
-            for player,_ in pairs(WBCDB.players) do
+        for _, itemId in ipairs(data.loot) do
+            for player, _ in pairs(WBCDB.players) do
                 if lootRanks[itemId][player] then
                     lootRanks[boss][player] = min(lootRanks[boss][player] or 99999, lootRanks[itemId][player])
                 end
@@ -122,29 +118,28 @@ function LootDistributor:ClearLog() StaticPopup_Show(DIALOG_CONFIRM_CLEAR) end
 function LootDistributor:SetLootLogText()
     local texts = {}
     local lootLog = WBCCache.lootLog
-    for i=#lootLog,1,-1 do
+    for i = #lootLog, 1, -1 do
         itemLog = lootLog[i]
-        text = date('%d/%m/%Y', itemLog.time) .. ',' .. itemLog.boss .. ',' .. itemLog.item .. ',FALSE,' ..
-                   itemLog.player
+        local playerPart = itemLog.player
+        local mainName = WBCDB.altMap[itemLog.player]
+        if mainName and mainName ~= itemLog.player then playerPart = mainName .. ',' .. itemLog.player end
+        text = date('%d/%m/%Y', itemLog.time) .. ',' .. itemLog.boss .. ',' .. itemLog.item .. ',' .. (tostring(itemLog.isRoll or false)) ..
+                   ',' .. playerPart
         table.insert(texts, text)
     end
     WBCLootLogEditBox:SetText(table.concat(texts, '\n'))
 end
 
-function LootDistributor:GetLootSource(itemId)
-    return dropsFrom[itemId]
-end
+function LootDistributor:GetLootSource(itemId) return dropsFrom[itemId] end
 
 function LootDistributor:RecalculateLootRanks()
     local lootRanks = {}
 
-    for _,itemId in ipairs(allItemIds) do
+    for _, itemId in ipairs(allItemIds) do
         lootRanks[itemId] = {}
         local interestedPlayers = getInterestedNames(itemId)
         table.sort(interestedPlayers, WBCoalition.Table.Sorters['points'])
-        for index,player in ipairs(interestedPlayers) do
-            lootRanks[itemId][player] = index
-        end
+        for index, player in ipairs(interestedPlayers) do lootRanks[itemId][player] = index end
     end
 
     recalculateBossLootRanks(lootRanks)
@@ -155,21 +150,21 @@ end
 function LootDistributor:RecalculateRaidLootRanks(raidMap, raidLootRanks)
     local lootRanks = WBCDB.lootRanks
 
-    for _,itemId in ipairs(allItemIds) do
+    for _, itemId in ipairs(allItemIds) do
         raidLootRanks[itemId] = {}
 
         local ordered = {}
         local n = 0
-        for player,rank in pairs(lootRanks[itemId] or {}) do
+        for player, rank in pairs(lootRanks[itemId] or {}) do
             ordered[rank] = player
-            n = n +1
+            n = n + 1
         end
         ordered.n = n
 
         local raidRank = 1
-        for index,player in ipairs(ordered) do
-            if raidMap[player] then 
-                raidLootRanks[itemId][player] = raidRank 
+        for index, player in ipairs(ordered) do
+            if raidMap[player] then
+                raidLootRanks[itemId][player] = raidRank
                 raidRank = raidRank + 1
             end
         end
@@ -182,7 +177,7 @@ function LootDistributor:OnCommand(cmd)
     local linkEndIndex = string.find(cmd, '|r')
     local cmdValid = cmd ~= '' and linkEndIndex
     if cmdValid then
-        local cmdMethod = cmd:sub(linkEndIndex+2, -1)
+        local cmdMethod = cmd:sub(linkEndIndex + 2, -1)
         if cmdMethod then
             local lootMethod = lootMethodMap[cmdMethod]
             if lootMethod then
@@ -191,10 +186,14 @@ function LootDistributor:OnCommand(cmd)
                     local msg = ' /roll'
                     if lootMethod == LOOT_METHOD_BUY then
                         msg = ' + in the raid chat or whisper if you want to buy with points'
+                        isRoll = true
                     end
-                    SendChatMessage(cmd:sub(1,linkEndIndex+1) .. msg, 'RAID_WARNING')
+                    SendChatMessage(cmd:sub(1, linkEndIndex + 1) .. msg, 'RAID_WARNING')
                     if lootMethod == LOOT_METHOD_BUY then
-                        SendChatMessage('if you want to donate add a message e.g.: "+ donate to '.. UnitName('player') ..'"', 'RAID')
+                        isRoll = false
+                        SendChatMessage(
+                            'if you want to donate add a message e.g.: "+ donate to ' .. UnitName('player') .. '"',
+                            'RAID')
                     end
                 else
                     WBCoalition:LogError("You can't do raid warnings")
@@ -216,7 +215,6 @@ end
 function LootDistributor:OnLootMessage(...)
     local message, _, _, _, player = ...
     if string.find(message, "receive") then
-        local playerNameUpper = string.upper(player)
         local startIndex, endIndex = string.find(message, "%[.+%]")
         local itemName = string.sub(message, startIndex + 1, endIndex - 1)
 
@@ -228,8 +226,14 @@ function LootDistributor:OnLootMessage(...)
             if WBCCache.tracks[name] and WBCCache.tracks[name].zone == zone then bossName = name end
         end
 
-        table.insert(WBCCache.lootLog,
-                     {zone = zone, item = itemName, player = player, boss = bossName, time = GetServerTime()})
+        table.insert(WBCCache.lootLog, {
+            zone = zone,
+            item = itemName,
+            player = player,
+            boss = bossName,
+            time = GetServerTime(),
+            isRoll = isRoll
+        })
     end
 end
 

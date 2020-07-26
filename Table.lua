@@ -340,8 +340,7 @@ end
 
 function Table:OnPlusInChat(name, msg)
     local mainName = WBCDB.altMap[name]
-    if mainName then name = mainName end
-    plusInTheChat[name] = {msg = msg, sender = name}
+    plusInTheChat[mainName or name] = {msg = msg, sender = name, mainName=mainName}
     WBCoalition.Table:Recalculate()
 end
 
